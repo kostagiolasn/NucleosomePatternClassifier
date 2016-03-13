@@ -13,10 +13,18 @@ import java.util.ArrayList;
 /**
  *
  * @author nikos
+ * Creates two files, one for each class and stores each instance per line,
+ * in its respective file. MALLET assumes the data is in the following format :
+ * [<instance name>] [<label>] [<sequence>]. In this case, the first token of each
+ * line (whitespace delimited, with optional comma) becomes the instance name, the second
+ * token becomes the label, and all additional text on the line is interpreted as a
+ * sequence of word tokens. Note that the data in this case will be a vector of
+ * feature/value pairs, such that a feature consists of a distinct word type and
+ * the value is the number of times that word occurs in the text.
  */
-public class InstancesToFiles {
+public class ManyInstancesPerFileConverter {
     
-    public InstancesToFiles(String [] args) throws FileNotFoundException {
+    public ManyInstancesPerFileConverter(String [] args) throws FileNotFoundException {
          //Read training file
        GenomicSequenceFileReader reader = new FAFileReader();
        //We create two sequence ArrayLists where NFR stands for Nucleosome Free Region

@@ -14,10 +14,12 @@ import java.util.ArrayList;
 /**
  *
  * @author nikos
+ * Creates one file per instance. MALLET will use the directory names as labels
+ * and the filenames as instance names.
  */
-public class InstancesToFiles2 {
+public class OneInstancePerFileConverter {
     
-    public InstancesToFiles2(String [] args) throws FileNotFoundException {
+    public OneInstancePerFileConverter(String [] args) throws FileNotFoundException {
          //Read training file
        GenomicSequenceFileReader reader = new FAFileReader();
        //We create two sequence ArrayLists where NFR stands for Nucleosome Free Region

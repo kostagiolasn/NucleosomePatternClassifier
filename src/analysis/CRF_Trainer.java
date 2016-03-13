@@ -19,9 +19,9 @@ import cc.mallet.types.InstanceList;
  *
  * @author nikos
  */
-public class CRF_Training {
+public class CRF_Trainer {
 
-    public CRF_Training (InstanceList trainingData, InstanceList testingData) {
+    public CRF_Trainer (InstanceList trainingData, InstanceList testingData) {
       // setup:
       //    CRF (model) and the state machine
       //    CRFOptimizableBy* objects (terms in the objective function)

@@ -23,7 +23,7 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
  *
  * @author nikos
  */
-public class ARFFLoadAndAnalyze {
+public class ARFFLoaderAndAnalyzer {
     public static BufferedReader readDataFile(String filename) {
 		BufferedReader inputReader = null;
  
@@ -70,7 +70,7 @@ public class ARFFLoadAndAnalyze {
 		return split;
 	}
  
-	public ARFFLoadAndAnalyze() throws Exception {
+	public ARFFLoaderAndAnalyzer() throws Exception {
 		BufferedReader datafile = readDataFile("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/ARFF/Data.txt");
                 
                 StringToWordVector filter = new StringToWordVector();

@@ -17,11 +17,11 @@ import cc.mallet.types.*;
  * @author nikos
  */
 
-public class DataImport {
+public class MalletDataImporter {
 
     Pipe pipe;
 
-    public DataImport() {
+    public MalletDataImporter() {
         pipe = buildPipe();
     }
 

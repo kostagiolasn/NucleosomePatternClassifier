@@ -29,9 +29,9 @@ import java.util.zip.GZIPInputStream;
  *
  * @author nikos
  */
-public class HMM_Training {
+public class HMM_Trainer {
 
-    public HMM_Training(String trainingFilename, String testingFilename) throws IOException {
+    public HMM_Trainer(String trainingFilename, String testingFilename) throws IOException {
         
         ArrayList<Pipe> pipes = new ArrayList<Pipe>();
         
