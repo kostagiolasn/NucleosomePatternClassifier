@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package analysis;
+package representation;
 
 import cc.mallet.fst.HMM;
 import cc.mallet.fst.HMMTrainerByLikelihood;
@@ -31,22 +31,11 @@ import java.util.zip.GZIPInputStream;
  */
 public class HMM_Trainer {
 
-    public HMM_Trainer(String trainingFilename, String testingFilename) throws IOException {
+    public HMM_Trainer(InstanceList trainingInstances, InstanceList testingInstances) throws IOException {
         
-        ArrayList<Pipe> pipes = new ArrayList<Pipe>();
+        HMM hmm = new HMM(trainingInstances.getDataAlphabet(),
+                        trainingInstances.getTargetAlphabet());
         
-        pipes.add(new SimpleTaggerSentence2TokenSequence());
-        pipes.add(new TokenSequence2FeatureSequence());
-        
-        Pipe pipe = new SerialPipes(pipes);
-        
-        InstanceList trainingInstances = new InstanceList(pipe);
-        InstanceList testingInstances = new InstanceList(pipe);
-        
-        trainingInstances.addThruPipe(new LineGroupIterator(new BufferedReader(new InputStreamReader(new FileInputStream(trainingFilename))), Pattern.compile("^\\s*$"), true));       
-        testingInstances.addThruPipe(new LineGroupIterator(new BufferedReader(new InputStreamReader(new FileInputStream(testingFilename))), Pattern.compile("^\\s*$"), true));
-        
-        HMM hmm = new HMM(pipe, null);
         hmm.addStatesForLabelsConnectedAsIn(trainingInstances);
         //hmm.addStatesForBiLabelsConnectedAsIn(trainingInstances);
         
