@@ -35,12 +35,15 @@ public class FAFileReader implements GenomicSequenceFileReader{
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             
             //for every sequence instance
+            int count = 0;
             while((str = reader.readLine()) != null) {
-                
-                //create sequence instance sample
-                SequenceInstance elem = new SequenceInstance(str);
-                //add it to the results list
-                results.add(elem);
+                if(count%2 != 0) {
+                    //create sequence instance sample
+                    SequenceInstance elem = new SequenceInstance(str);
+                    //add it to the results list
+                    results.add(elem);
+                }
+                count++;
             }
             
             reader.close();
@@ -49,7 +52,6 @@ public class FAFileReader implements GenomicSequenceFileReader{
         } catch (IOException e) {
             Logger.getLogger(FAFileReader.class.getName()).log(Level.SEVERE, null, e);
         }
-        
         return results;
     }
 

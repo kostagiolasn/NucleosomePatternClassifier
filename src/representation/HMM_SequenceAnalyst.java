@@ -5,50 +5,40 @@
  */
 package representation;
 
-import cc.mallet.fst.HMM;
-import cc.mallet.fst.HMMTrainerByLikelihood;
-import cc.mallet.fst.PerClassAccuracyEvaluator;
-import cc.mallet.fst.TransducerEvaluator;
-import cc.mallet.pipe.Pipe;
-import cc.mallet.pipe.SerialPipes;
-import cc.mallet.pipe.SimpleTaggerSentence2TokenSequence;
-import cc.mallet.pipe.TokenSequence2FeatureSequence;
-import cc.mallet.pipe.iterator.LineGroupIterator;
-import cc.mallet.types.InstanceList;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
+import entities.GenomicSequence;
+import entities.HMMSequence.Packet;
+import entities.SequenceInstance;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+public class HMM_SequenceAnalyst implements GenomicSequenceAnalyst<List<ObservationDiscrete<Packet>>> {
 
+    @Override
+    public List<List<ObservationDiscrete<Packet>>> represent(List<SequenceInstance> Seqs) {
+        
+        List<List<ObservationDiscrete<Packet>>> Res = new ArrayList<>();
+        
+        Map<Character, ObservationDiscrete<Packet>> nucleotideMap = new HashMap<>();
+        nucleotideMap.put('A', Packet.A.observation());
+        nucleotideMap.put('T', Packet.T.observation());
+        nucleotideMap.put('C', Packet.C.observation());
+        nucleotideMap.put('G', Packet.G.observation());
+        
+        for (GenomicSequence Seq : Seqs) {
+            List<ObservationDiscrete<Packet>> temp = new ArrayList<>();
+            
+            for(Character c : Seq.getSymbolSequence().toCharArray()) {
+                temp.add(nucleotideMap.get(c));
+            }
+            System.out.println(temp);
+            
+            Res.add(temp);
+        }
+        
+        return Res;
 
-/**
- *
- * @author nikos
- */
-public class HMM_Trainer {
-
-    public HMM_Trainer(InstanceList trainingInstances, InstanceList testingInstances) throws IOException {
-        
-        HMM hmm = new HMM(trainingInstances.getDataAlphabet(),
-                        trainingInstances.getTargetAlphabet());
-        
-        hmm.addStatesForLabelsConnectedAsIn(trainingInstances);
-        //hmm.addStatesForBiLabelsConnectedAsIn(trainingInstances);
-        
-        HMMTrainerByLikelihood trainer =
-                new HMMTrainerByLikelihood(hmm);
-        TransducerEvaluator trainingEvaluator = 
-                new PerClassAccuracyEvaluator(trainingInstances, "training");
-        TransducerEvaluator testingEvaluator = 
-                new PerClassAccuracyEvaluator(testingInstances, "testing");
-        
-        trainer.train(trainingInstances, 10);
-        trainingEvaluator.evaluate(trainer);
-        testingEvaluator.evaluate(trainer);
     }
-      
 }
