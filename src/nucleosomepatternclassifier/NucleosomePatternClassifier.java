@@ -6,32 +6,20 @@
 package nucleosomepatternclassifier;
 
 import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
+import entities.HMMFeatureVector;
 import representation.HMM_SequenceAnalyst;
-import cc.mallet.types.CrossValidationIterator;
-import cc.mallet.types.Instance;
-import cc.mallet.types.InstanceList;
-import entities.GenomicSequence;
 import entities.HMMSequence;
+import entities.RepresentationFeatureVector;
 import entities.SequenceInstance;
-import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
-import io.MalletDataImporter;
 import io.FAFileReader;
-import io.GenomicSequenceFileReader;
-import io.ManyInstancesPerFileConverter;
-import io.OneInstancePerFileConverter;
-import io.TextToArffConverter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import static java.util.Collections.rotate;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import representation.GenomicSequenceAnalyst;
-import representation.NGG_SequenceAnalyst;
-import weka.core.Instances;
+import representation.GenomicSequenceRepresentationHandler;
+import representation.HmmHandler;
 
 /**
  *
@@ -73,9 +61,15 @@ public class NucleosomePatternClassifier {
         NFR_trainingSeqs = new ArrayList();
          List<SequenceInstance> NBS_trainingSeqs;
         NBS_trainingSeqs = new ArrayList();
+        
+        List<SequenceInstance> NFR_testingSeqs = null;
+        NFR_trainingSeqs = new ArrayList();
+         List<SequenceInstance> NBS_testingSeqs = null;
+        NBS_trainingSeqs = new ArrayList();
 
         for(int i = 0; i < evaluations; i++) {
             
+            /* Initializing the training sequences */
             for(int j = 0; j < (nfolds-1)*NFRpartitionSize; j++) {
                 NFR_trainingSeqs.add(NFR_Seqs.get(j));
             }
@@ -84,78 +78,59 @@ public class NucleosomePatternClassifier {
                 NBS_trainingSeqs.add(NBS_Seqs.get(j));
             }
             
+            /* Initializing the testing sequences */
+            for(int j = (nfolds-1)*NFRpartitionSize; j < NFR_Seqs.size(); j++) {
+                NFR_testingSeqs.add(NBS_Seqs.get(j));
+            }
+            
+            for(int j = (nfolds-1)*NBSpartitionSize; j < NBS_Seqs.size(); j++) {
+                NBS_testingSeqs.add(NBS_Seqs.get(j));
+            }
+            
+            /* Representing the sequences as HMMs */
+            List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTrainingHMM = analyst.represent(NFR_trainingSeqs);
+            List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTrainingHMM = analyst.represent(NBS_trainingSeqs);
+            
+            /* The same with the testing sequences */
+            List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTestingHMM = analyst.represent(NFR_testingSeqs);
+            List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTestingHMM = analyst.represent(NBS_testingSeqs);
+            
+            /* We train the two HMMs only by using the training HMM sequences */
+            
+            GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>> handler = new HmmHandler();
+            handler.train(NFRTrainingHMM, "Nucleosome Free Region");
+            handler.train(NBSTrainingHMM, "Nucleosome Binding Sight");
+            
+            /* Initializing the vectors we want to store */
+            
+            ArrayList<HMMFeatureVector> NFRTrainingVectors = new ArrayList<HMMFeatureVector>();
+            ArrayList<HMMFeatureVector> NBSTrainingVectors = new ArrayList<HMMFeatureVector>();
+            
+            ArrayList<HMMFeatureVector> NFRTestingVectors = new ArrayList<HMMFeatureVector>();
+            ArrayList<HMMFeatureVector> NBSTestingVectors = new ArrayList<HMMFeatureVector>();
+            
+            /* Getting the feature vectors for each of our sequence lists */
+            
+            for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTrainingHMM) {
+                NFRTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+            }
+            
+            for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTrainingHMM) {
+                NBSTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+            }
+            
+            for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTestingHMM) {
+                NFRTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+            }
+            
+            for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTestingHMM) {
+                NBSTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+            }
+            
             rotate(NFR_Seqs, NFRpartitionSize);
             rotate(NBS_Seqs, NBSpartitionSize);
         }
-        
-        List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTrainingHMM = analyst.represent(NFR_trainingSeqs);
-        List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTrainingHMM = analyst.represent(NBS_trainingSeqs);
 
-        
-       //ManyInstancesPerFileConverter input = new ManyInstancesPerFileConverter(args);
-       
-       //TextToArffConverter ttac = new TextToArffConverter("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets");
-       
-       //ARFFLoaderAndAnalyzer analyzer = new ARFFLoaderAndAnalyzer();
-        
-       /*int nfolds = 10;
-       
-       MalletDataImporter importer = new MalletDataImporter();
-       
-       InstanceList NFR_instances = importer.readDirectory(new File("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets/NFR/"));
-       for (Iterator<Instance> it = NFR_instances.iterator(); it.hasNext();) {
-            Instance n = it.next();
-            System.out.println(n);
-        }
-       CrossValidationIterator NFR_iterator = new CrossValidationIterator(NFR_instances, nfolds);
-       
-       InstanceList NBS_instances = importer.readDirectory(new File("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets/NBS/"));
-        for (Iterator<Instance> it = NBS_instances.iterator(); it.hasNext();) {
-            Instance n = it.next();
-            System.out.println(n);
-        }
-       CrossValidationIterator NBS_iterator = new CrossValidationIterator(NBS_instances, nfolds);
-       
-       while(NFR_iterator.hasNext() && NBS_iterator.hasNext()) {
-           
-           InstanceList NFR_training_instances = NFR_iterator.nextSplit()[0];
-           InstanceList NFR_testing_instances = NFR_iterator.nextSplit()[1];
-           
-           InstanceList NBS_training_instances = NBS_iterator.nextSplit()[0];
-           InstanceList NBS_testing_instances = NBS_iterator.nextSplit()[1];*/
-           
-           /* Here we take each set of instances and we train its Hidden Markov Model
-           using the HMM_SequenceAnalyst constructor.
-           */
-           
-           //HMM_FeatureAnalyst NFRtrainer = new HMM_SequenceAnalyst(NFR_training_instances, NFR_testing_instances);
-           //HMM_FeatureAnalyst NBStrainer = new HMM_SequenceAnalyst(NBS_training_instances, NBS_testing_instances);
-           
-           /* Here we take each set of instances and we create its n-gram graph using the
-           NGG_SequenceAnalyst constructor.
-           */
-           
-           /*DocumentNGramGraph NFR_training_ngGraph = new DocumentNGramGraph();
-           DocumentNGramGraph NBS_training_ngGraph = new DocumentNGramGraph();
-           
-           NGG_SequenceAnalyst NGGtrainer = new NGG_SequenceAnalyst(NFR_training_instances, NBS_training_instances, NFR_training_ngGraph, NBS_training_ngGraph);
-           
-           int NFR_TruePositives = 0, NFR_FalseNegatives = 0, NFR_FalsePositives = 0, NFR_TrueNegatives;
-           int NBS_TruePositives = 0, NBS_FalseNegatives = 0, NBS_FalsePositives, NBS_TrueNegatives;*/
-           
-           /* Here we classify the testing instances both for the NFR and NBS classes and 
-           we take the false negative, the false positives, the true negatives and the true positives
-           in order to use some statistical evaluations in the future.
-           */
-           
-           /*NGGtrainer.NGGClassify(NFR_training_ngGraph, NBS_training_ngGraph, NFR_testing_instances, NFR_TruePositives, NFR_FalsePositives);
-           NBS_FalsePositives = NFR_FalseNegatives;
-           NBS_TrueNegatives = NFR_TruePositives;
-           NGGtrainer.NGGClassify(NBS_training_ngGraph, NFR_training_ngGraph, NBS_testing_instances, NBS_TruePositives, NBS_FalsePositives);
-           NFR_FalsePositives = NBS_FalseNegatives;
-           NFR_TrueNegatives = NBS_TruePositives;
-
-       }*/
        
     }
     
