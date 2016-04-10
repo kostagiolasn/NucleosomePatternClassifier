@@ -22,7 +22,7 @@ public class HMMFeatureVector implements RepresentationFeatureVector {
 
     @Override
     public String getLabel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return label;
     }
 
     public double getProbArrayAtIndex(int index) {

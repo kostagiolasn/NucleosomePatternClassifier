@@ -4,14 +4,16 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/RepresentationFeatureVector.java</file>
-            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/HMMFeatureVector.java</file>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/GenomicSequence.java</file>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/HMMSequence.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/NGGFeatureVector.java</file>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/SequenceInstance.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/representation/NGGHandler.java</file>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/representation/GenomicSequenceAnalyst.java</file>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/nucleosomepatternclassifier/NucleosomePatternClassifier.java</file>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/representation/HmmHandler.java</file>
             <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/representation/GenomicSequenceRepresentationHandler.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/representation/NGG_SequenceAnalyst.java</file>
         </group>
     </open-files>
 </project-private>

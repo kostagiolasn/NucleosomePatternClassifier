@@ -99,7 +99,7 @@ public class NucleosomePatternClassifier {
             
             GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>> handler = new HmmHandler();
             handler.train(NFRTrainingHMM, "Nucleosome Free Region");
-            handler.train(NBSTrainingHMM, "Nucleosome Binding Sight");
+            handler.train(NBSTrainingHMM, "Nucleosome Binding Site");
             
             /* Initializing the vectors we want to store */
             

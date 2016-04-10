@@ -5,6 +5,8 @@
  */
 package representation;
 
+import entities.SequenceInstance;
+import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,11 +14,22 @@ import java.util.List;
  *
  * @author nikos
  */
-public class NGG_SequenceAnalyst implements GenomicSequenceAnalyst {
+public class NGG_SequenceAnalyst implements GenomicSequenceAnalyst<List<DocumentNGramGraph>> {
 
     @Override
-    public List represent(List Seqs) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<List<DocumentNGramGraph>> represent(List<SequenceInstance> Seqs) {
+        List<List<DocumentNGramGraph>> Res = new ArrayList<>();
+        
+        for(SequenceInstance instance : Seqs) {
+            DocumentNGramGraph tempGraph = new DocumentNGramGraph();
+            tempGraph.setDataString(instance.getSymbolSequence());
+            List<DocumentNGramGraph> graphList = new ArrayList<>();
+            
+            graphList.add(tempGraph);
+            Res.add(graphList);
+            
+        }
+        return Res;
     }
     
 

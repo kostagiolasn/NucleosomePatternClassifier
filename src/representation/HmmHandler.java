@@ -67,25 +67,25 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
     @Override
     public HMMFeatureVector getFeatureVector(List<ObservationDiscrete<Packet>> representation) {
         HMMFeatureVector v = new HMMFeatureVector();
-            double dMaxProb = -1.0;
-            String label = null;
-            int count = 0;
+        double dMaxProb = -1.0;
+        String label = null;
+        int count = 0;
 
-            for(String className : classModel.keySet()) {
-                Hmm tempModel = classModel.get(className);
+        for(String className : classModel.keySet()) {
+            Hmm tempModel = classModel.get(className);
 
-                double dProb = tempModel.probability(representation);
+            double dProb = tempModel.probability(representation);
 
-                if(dProb > dMaxProb) {
-                    dMaxProb = dProb;
-                    label = className;
-                    v.setLabel(label);
-                }
-                v.setProbArrayAtIndex(dMaxProb, count);
-                count++;
+            if(dProb > dMaxProb) {
+                dMaxProb = dProb;
+                label = className;
+                v.setLabel(label);
             }
+            v.setProbArrayAtIndex(dMaxProb, count);
+            count++;
+        }
 
-            return v;    
+        return v;    
     }
     
 }
