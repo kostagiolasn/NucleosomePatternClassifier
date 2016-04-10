@@ -53,7 +53,6 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         
         NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
         GraphSimilarity similarity;
-        String label = null;
         int count = 0;
         
         for(String className : classModel.keySet()) {
