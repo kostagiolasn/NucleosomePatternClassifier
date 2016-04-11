@@ -56,9 +56,9 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         int count = 0;
         
         for(String className : classModel.keySet()) {
-            DocumentNGramGraph curClasModel = classModel.get(className);
+            DocumentNGramGraph curClassModel = classModel.get(className);
             
-            similarity = comparator.getSimilarityBetween(curClasModel, representation);
+            similarity = comparator.getSimilarityBetween(curClassModel, representation);
             v.setContainmentSimilarityArrayAtIndex(similarity.ContainmentSimilarity, count);
             v.setSizeSimilarityArrayAtIndex(similarity.SizeSimilarity, count);
             v.setValueSimilarityArrayAtIndex(similarity.ValueSimilarity, count);

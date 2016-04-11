@@ -24,11 +24,11 @@ public class BOWFeatureVector implements RepresentationFeatureVector {
         return label;
     }
     
-    public double getProbArrayAtIndex(int index) {
+    public double getCosSimilarityArrayAtIndex(int index) {
         return cosSimilarityArray[index];
     }
 
-    public void setProbArrayAtIndex(double element, int index) {
+    public void setCosSimilarityArrayAtIndex(double element, int index) {
         this.cosSimilarityArray[index] = element;
     }
     
