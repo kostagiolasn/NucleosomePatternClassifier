@@ -1,3 +1,7 @@
 build/
 nbproject/
 dist/
+lib/
+HMM/
+Datasets/
+ARFF/
