@@ -8,15 +8,10 @@ package representation;
 import entities.NGGFeatureVector;
 import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
-import gr.demokritos.iit.jinsect.events.GraphSimilarityComparatorAdapter;
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
-import gr.demokritos.iit.jinsect.structs.ISimilarity;
-import java.io.InvalidClassException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

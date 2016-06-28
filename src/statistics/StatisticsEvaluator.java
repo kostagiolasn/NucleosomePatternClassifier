@@ -5,20 +5,25 @@
  */
 package statistics;
 
+import weka.core.Instances;
+
 /**
  *
  * @author nikos
  */
 public interface StatisticsEvaluator {
-    public double getAccuracy(int TruePositives, int FalseNegatives, int FalsePositives, int TrueNegatives);
     
-    public double getPrecision(int TruePositives, int FalseNegatives, int FalsePositives, int TrueNegatives);
+    public double [][] getConfusionMatrix(Instances NFR_Training_Instances, Instances NBS_Training_Instances, Instances NFR_Testing_Instances, Instances NBS_Testing_Instances);
     
-    public double getRecall(int TruePositives, int FalseNegatives, int FalsePositives, int TrueNegatives);
+    public double getAccuracy(double[][] ConfMatrix);
     
-    public double getSpecificity(int TruePositives, int FalseNegatives, int FalsePositives, int TrueNegatives);
+    public double getPrecision(double[][] ConfMatrix);
     
-    public double getAUC(int TruePositives, int FalseNegatives, int FalsePositives, int TrueNegatives);
+    public double getRecall(double[][] ConfMatrix);
     
-    public double getfScore(int TruePositives, int FalseNegatives, int FalsePositives, int TrueNegatives);
+    public double getSpecificity(double[][] ConfMatrix);
+    
+    public double getAUC(double[][] ConfMatrix);
+    
+    public double getfScore(double[][] ConfMatrix);
 }

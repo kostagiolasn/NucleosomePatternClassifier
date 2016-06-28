@@ -11,6 +11,7 @@ import representation.HMM_SequenceAnalyst;
 import entities.HMMSequence;
 import entities.RepresentationFeatureVector;
 import entities.SequenceInstance;
+import entities.WekaHMMFeatureVector;
 import io.FAFileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,6 +21,9 @@ import java.util.List;
 import representation.GenomicSequenceAnalyst;
 import representation.GenomicSequenceRepresentationHandler;
 import representation.HmmHandler;
+import statistics.BinaryStatisticsEvaluator;
+import weka.core.Instance;
+import weka.core.Instances;
 
 /**
  *
@@ -126,6 +130,25 @@ public class NucleosomePatternClassifier {
             for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTestingHMM) {
                 NBSTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
             }
+            
+            //Get the Weka feature vectors
+            WekaHMMFeatureVector HMMfv= new WekaHMMFeatureVector();
+            Instances NFR_Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors);
+            Instances NBS_Training_Instances = HMMfv.fillInstanceSet(NBSTrainingVectors);
+            Instances NFR_Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors);
+            Instances NBS_Testing_Instances = HMMfv.fillInstanceSet(NBSTestingVectors);
+            
+            // Perform classification and get Confusion Matrix
+            BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
+            double[][] ConfMatrix = ev.getConfusionMatrix(NFR_Training_Instances, NBS_Training_Instances, NFR_Testing_Instances, NBS_Testing_Instances);
+            
+            // Print results
+            ev.getPrecision(ConfMatrix);
+            ev.getAccuracy(ConfMatrix);
+            ev.getAUC(ConfMatrix);
+            ev.getRecall(ConfMatrix);
+            ev.getfScore(ConfMatrix);
+            ev.getSpecificity(ConfMatrix);
             
             rotate(NFR_Seqs, NFRpartitionSize);
             rotate(NBS_Seqs, NBSpartitionSize);
