@@ -67,9 +67,9 @@ public class NucleosomePatternClassifier {
         NBS_trainingSeqs = new ArrayList();
         
         List<SequenceInstance> NFR_testingSeqs = null;
-        NFR_trainingSeqs = new ArrayList();
+        NFR_testingSeqs = new ArrayList();
          List<SequenceInstance> NBS_testingSeqs = null;
-        NBS_trainingSeqs = new ArrayList();
+        NBS_testingSeqs = new ArrayList();
 
         for(int i = 0; i < evaluations; i++) {
             

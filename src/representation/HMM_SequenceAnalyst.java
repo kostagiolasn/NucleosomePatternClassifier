@@ -33,7 +33,7 @@ public class HMM_SequenceAnalyst implements GenomicSequenceAnalyst<List<Observat
             for(Character c : Seq.getSymbolSequence().toCharArray()) {
                 temp.add(nucleotideMap.get(c));
             }
-            System.out.println(temp);
+            //System.out.println(temp);
             
             Res.add(temp);
         }

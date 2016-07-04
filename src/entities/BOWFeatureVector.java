@@ -5,6 +5,8 @@
  */
 package entities;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author nikos
@@ -12,8 +14,12 @@ package entities;
 public class BOWFeatureVector implements RepresentationFeatureVector {
 
     String label;
-    double cosSimilarityArray[];
-    
+    ArrayList<Double> cosSimilarityArray;
+
+    public BOWFeatureVector() {
+       cosSimilarityArray = new ArrayList<>();
+    }
+
     @Override
     public void setLabel(String classLabel) {
         label = classLabel;
@@ -23,13 +29,13 @@ public class BOWFeatureVector implements RepresentationFeatureVector {
     public String getLabel() {
         return label;
     }
-    
+
     public double getCosSimilarityArrayAtIndex(int index) {
-        return cosSimilarityArray[index];
+        return cosSimilarityArray.get(index);
     }
 
     public void setCosSimilarityArrayAtIndex(double element, int index) {
-        this.cosSimilarityArray[index] = element;
+        this.cosSimilarityArray.add(index, element);
     }
-    
+
 }

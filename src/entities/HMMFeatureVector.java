@@ -5,20 +5,26 @@
  */
 package entities;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author nikos
  */
 public class HMMFeatureVector implements RepresentationFeatureVector {
-    
+
     String label;
-    double probArray[];
+    ArrayList<Double> probArray;
+
+    public HMMFeatureVector() {
+        probArray = new ArrayList<>();
+    }
 
     @Override
     public void setLabel(String classLabel) {
-        
+
         label = classLabel;
-    }   
+    }
 
     @Override
     public String getLabel() {
@@ -26,13 +32,11 @@ public class HMMFeatureVector implements RepresentationFeatureVector {
     }
 
     public double getProbArrayAtIndex(int index) {
-        return probArray[index];
+        return probArray.get(index);
     }
 
     public void setProbArrayAtIndex(double element, int index) {
-        this.probArray[index] = element;
+        this.probArray.add(index, element);
     }
 
-
-    
 }

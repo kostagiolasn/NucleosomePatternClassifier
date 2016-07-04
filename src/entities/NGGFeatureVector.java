@@ -7,6 +7,7 @@ package entities;
 
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
 import gr.demokritos.iit.jinsect.structs.ISimilarity;
+import java.util.ArrayList;
 
 /**
  *
@@ -15,9 +16,17 @@ import gr.demokritos.iit.jinsect.structs.ISimilarity;
 public class NGGFeatureVector implements RepresentationFeatureVector{
 
     String label;
-    double containmentSimilarityArray[];
-    double sizeSimilarityArray[];
-    double valueSimilarityArray[];
+    ArrayList <Double> containmentSimilarityArray;
+    ArrayList <Double> sizeSimilarityArray;
+    ArrayList <Double> valueSimilarityArray;
+
+    public NGGFeatureVector() {
+        containmentSimilarityArray = new ArrayList<>();
+        sizeSimilarityArray = new ArrayList<>();
+        valueSimilarityArray = new ArrayList<>();
+    }
+    
+    
     @Override
     public void setLabel(String classLabel) {
         label = classLabel;
@@ -29,27 +38,27 @@ public class NGGFeatureVector implements RepresentationFeatureVector{
     }
     
     public double getContainmentSimilarityArrayAtIndex(int index) {
-        return containmentSimilarityArray[index];
+        return containmentSimilarityArray.get(index);
     }
     
     public void setContainmentSimilarityArrayAtIndex(double element, int index) {
-        this.containmentSimilarityArray[index] = element;
+        this.containmentSimilarityArray.add(index, element);
     }
     
     public double getSizeSimilarityArrayAtIndex(int index) {
-        return sizeSimilarityArray[index];
+        return sizeSimilarityArray.get(index);
     }
     
     public void setSizeSimilarityArrayAtIndex(double element, int index) {
-        this.sizeSimilarityArray[index] = element;
+        this.sizeSimilarityArray.add(index, element);
     }
     
     public double getValueSimilarityArrayAtIndex(int index) {
-        return valueSimilarityArray[index];
+        return valueSimilarityArray.get(index);
     }
     
     public void setValueSimilarityArrayAtIndex(double element, int index) {
-        this.valueSimilarityArray[index] = element;
+        this.valueSimilarityArray.add(index, element);
     }
     
 }

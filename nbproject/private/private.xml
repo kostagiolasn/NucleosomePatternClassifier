@@ -2,6 +2,14 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/HMMFeatureVector.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/representation/HMM_SequenceAnalyst.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/WekaHMMFeatureVector.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/NGGFeatureVector.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/nucleosomepatternclassifier/NucleosomePatternClassifier.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/representation/HmmHandler.java</file>
+            <file>file:/home/nikos/NetBeansProjects/NucleosomePatternClassifier/src/entities/BOWFeatureVector.java</file>
+        </group>
     </open-files>
 </project-private>

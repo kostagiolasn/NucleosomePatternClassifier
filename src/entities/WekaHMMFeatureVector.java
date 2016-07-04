@@ -17,19 +17,19 @@ import weka.core.Instances;
  * @author nikos
  */
 public class WekaHMMFeatureVector implements WekaFeatureVector {
-
+    
     @Override
     public FastVector initializeWekaFeatureVector() {
         //Declaration of the numeric value dMaxProb
         Attribute Attribute1 = new Attribute("Prob1");
         Attribute Attribute2 = new Attribute("Prob2");
-        
+
         //Declare the class attribute along with its values
         FastVector fvClassVal = new FastVector(2);
         fvClassVal.addElement("NFR");
         fvClassVal.addElement("NBS");
         Attribute ClassAttribute = new Attribute("theClass", fvClassVal);
-        
+
         //Declare the feature vector
         FastVector fvWekaAttributesHmm = new FastVector(3);
         fvWekaAttributesHmm.addElement(Attribute1);
@@ -38,18 +38,21 @@ public class WekaHMMFeatureVector implements WekaFeatureVector {
         
         return fvWekaAttributesHmm;
     }
-
+    
     public Instance fillFeatureVector(HMMFeatureVector vSource) {
         Instance i = new DenseInstance(3);
         FastVector vTarget;
+        i.setValue(0,"something");
+        i.setValue(1, "positive");
+        System.out.println(i);
         
         WekaHMMFeatureVector v = new WekaHMMFeatureVector();
         vTarget = v.initializeWekaFeatureVector();
         
-        i.setValue((Attribute)vTarget.elementAt(0), vSource.getProbArrayAtIndex(0) );
-        i.setValue((Attribute)vTarget.elementAt(1), vSource.getProbArrayAtIndex(1) );
+        i.setValue((Attribute) vTarget.elementAt(0), vSource.getProbArrayAtIndex(0));
+        i.setValue((Attribute) vTarget.elementAt(1), vSource.getProbArrayAtIndex(1));
         
-        i.setValue((Attribute)vTarget.elementAt(2), vSource.getLabel() );
+        i.setValue((Attribute) vTarget.elementAt(2), vSource.getLabel());
         
         return i;
     }
@@ -59,20 +62,21 @@ public class WekaHMMFeatureVector implements WekaFeatureVector {
         FastVector fvWekaAttributesHmm = new FastVector(3);
         
         Instances isSet = new Instances(vList.get(0).getLabel(), fvWekaAttributesHmm, vList.size());
-        
-        if("NFR".equals(vList.get(0).label)) {
-            isSet.setClassIndex(0);
-        }
-        else
-            isSet.setClassIndex(1);
+
+        /*if("NFR".equals(vList.get(0).label)) {
+         isSet.setClassIndex(0);
+         }
+         else
+         isSet.setClassIndex(1);*/
+        isSet.setClassIndex(isSet.numAttributes() - 1);
         
         for (HMMFeatureVector HMMv : vList) {
             
             Instance i = fillFeatureVector(HMMv);
             
-            isSet.add(i); 
+            isSet.add(i);            
         }
-       
+        
         return isSet;
     }
     
