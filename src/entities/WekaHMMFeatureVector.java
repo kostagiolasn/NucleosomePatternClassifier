@@ -42,9 +42,6 @@ public class WekaHMMFeatureVector implements WekaFeatureVector {
     public Instance fillFeatureVector(HMMFeatureVector vSource) {
         Instance i = new DenseInstance(3);
         FastVector vTarget;
-        i.setValue(0,"something");
-        i.setValue(1, "positive");
-        System.out.println(i);
         
         WekaHMMFeatureVector v = new WekaHMMFeatureVector();
         vTarget = v.initializeWekaFeatureVector();
