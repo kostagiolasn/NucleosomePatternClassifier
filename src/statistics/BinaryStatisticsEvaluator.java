@@ -57,25 +57,8 @@ public class BinaryStatisticsEvaluator implements StatisticsEvaluator {
     }
 
     @Override
-    public double [][] getConfusionMatrix(Instances NFR_Training_Instances, Instances NBS_Training_Instances, Instances NFR_Testing_Instances, Instances NBS_Testing_Instances) {
-            Instances Training_Instances = null;
-            Instances Testing_Instances = null;
+    public double [][] getConfusionMatrix(Instances Training_Instances, Instances Testing_Instances) {
             
-            for (Instance instance : NFR_Training_Instances) {
-                Training_Instances.add(instance);
-            }
-            
-            for (Instance instance : NBS_Training_Instances) {
-                Training_Instances.add(instance);
-            }
-            
-            for (Instance instance : NFR_Testing_Instances) {
-                Testing_Instances.add(instance);
-            }
-            
-            for (Instance instance : NBS_Testing_Instances) {
-                Testing_Instances.add(instance);
-            }
             
             Classifier cModel = (Classifier)new NaiveBayes();
             //Classifier cModel = (Classifier)new RandomForest();

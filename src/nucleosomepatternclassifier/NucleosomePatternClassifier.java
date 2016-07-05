@@ -133,22 +133,19 @@ public class NucleosomePatternClassifier {
             
             //Get the Weka feature vectors
             WekaHMMFeatureVector HMMfv= new WekaHMMFeatureVector();
-            Instances NFR_Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors);
-            Instances NBS_Training_Instances = HMMfv.fillInstanceSet(NBSTrainingVectors);
-            Instances NFR_Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors);
-            Instances NBS_Testing_Instances = HMMfv.fillInstanceSet(NBSTestingVectors);
+            Instances Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
+            Instances Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
             
             // Perform classification and get Confusion Matrix
             BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
-            double[][] ConfMatrix = ev.getConfusionMatrix(NFR_Training_Instances, NBS_Training_Instances, NFR_Testing_Instances, NBS_Testing_Instances);
+            double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances);
             
             // Print results
-            ev.getPrecision(ConfMatrix);
-            ev.getAccuracy(ConfMatrix);
-            ev.getAUC(ConfMatrix);
-            ev.getRecall(ConfMatrix);
-            ev.getfScore(ConfMatrix);
-            ev.getSpecificity(ConfMatrix);
+            System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
+            System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));;
+            System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
+            System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
+            System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
             
             rotate(NFR_Seqs, NFRpartitionSize);
             rotate(NBS_Seqs, NBSpartitionSize);

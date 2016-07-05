@@ -19,7 +19,7 @@ import weka.core.Instances;
 public class WekaNGGFeatureVector implements WekaFeatureVector{
 
     @Override
-    public FastVector initializeWekaFeatureVector() {
+    public ArrayList<Attribute> initializeWekaFeatureVector() {
         //Declaration of the numeric value dMaxProb
         Attribute Attribute1 = new Attribute("containmentSimilarity1");
         Attribute Attribute2 = new Attribute("sizeSimilarity1");
@@ -28,44 +28,43 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
         Attribute Attribute5 = new Attribute("sizeSimilarity2");
         Attribute Attribute6 = new Attribute("valueSimilarity2");
         //Declare the class attribute along with its values
-        FastVector fvClassVal = new FastVector(2);
-        fvClassVal.addElement("NFR");
-        fvClassVal.addElement("NBS");
+        ArrayList<String> fvClassVal = new ArrayList<>();
+        fvClassVal.add("Nucleosome Free Region");
+        fvClassVal.add("Nucleosome Binding Site");
         Attribute ClassAttribute = new Attribute("theClass", fvClassVal);
         
         //Declare the feature vector
-        FastVector fvWekaAttributesNgg = new FastVector(7);
-        fvWekaAttributesNgg.addElement(Attribute1);
-        fvWekaAttributesNgg.addElement(Attribute2);
-        fvWekaAttributesNgg.addElement(Attribute3);
-        fvWekaAttributesNgg.addElement(Attribute4);
-        fvWekaAttributesNgg.addElement(Attribute5);
-        fvWekaAttributesNgg.addElement(Attribute6);
-        fvWekaAttributesNgg.addElement(ClassAttribute); 
+        ArrayList<Attribute> fvWekaAttributesNgg;
+        fvWekaAttributesNgg = new ArrayList<>();
+        fvWekaAttributesNgg.add(Attribute1);
+        fvWekaAttributesNgg.add(Attribute2);
+        fvWekaAttributesNgg.add(Attribute3);
+        fvWekaAttributesNgg.add(Attribute4);
+        fvWekaAttributesNgg.add(Attribute5);
+        fvWekaAttributesNgg.add(Attribute6);
+        fvWekaAttributesNgg.add(ClassAttribute); 
         
         return fvWekaAttributesNgg;
     }
     
-    public Instance fillFeatureVector(NGGFeatureVector vSource) {
-        Instance i = new DenseInstance(7);
-        FastVector vTarget;
+    public Instance fillFeatureVector(NGGFeatureVector vSource, Instances data) {
         
-        WekaHMMFeatureVector v = new WekaHMMFeatureVector();
-        vTarget = v.initializeWekaFeatureVector();
+        double[] values = new double[data.numAttributes()];
         
-        i.setValue((Attribute)vTarget.elementAt(0), vSource.getContainmentSimilarityArrayAtIndex(0) );
-        i.setValue((Attribute)vTarget.elementAt(1), vSource.getContainmentSimilarityArrayAtIndex(0) );
-        i.setValue((Attribute)vTarget.elementAt(2), vSource.getSizeSimilarityArrayAtIndex(0) );
-        i.setValue((Attribute)vTarget.elementAt(3), vSource.getSizeSimilarityArrayAtIndex(1) );
-        i.setValue((Attribute)vTarget.elementAt(4), vSource.getValueSimilarityArrayAtIndex(1) );
-        i.setValue((Attribute)vTarget.elementAt(5), vSource.getValueSimilarityArrayAtIndex(1) );
+        values[0] = vSource.getContainmentSimilarityArrayAtIndex(0);
+        values[1] = vSource.getContainmentSimilarityArrayAtIndex(1);
+        values[2] = vSource.getSizeSimilarityArrayAtIndex(0);
+        values[3] = vSource.getSizeSimilarityArrayAtIndex(1);
+        values[4] = vSource.getValueSimilarityArrayAtIndex(0);
+        values[5] = vSource.getValueSimilarityArrayAtIndex(1);
+        values[6] = data.attribute(6).indexOfValue(vSource.getLabel());
         
-        i.setValue((Attribute)vTarget.elementAt(6), vSource.getLabel() );
+        Instance inst = new DenseInstance(1.0, values);
         
-        return i;
+        return inst;
     }
      
-    public Instances fillInstanceSet(ArrayList<NGGFeatureVector> vList) {
+    public Instances fillInstanceSet(ArrayList<NGGFeatureVector> vList, ArrayList<NGGFeatureVector> vList2) {
         FastVector fvWekaAttributesBow = new FastVector(7);
         
         Instances isSet = new Instances(vList.get(0).getLabel(), fvWekaAttributesBow, vList.size());
@@ -78,9 +77,16 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
         
         for (NGGFeatureVector NGGv : vList) {
             
-            Instance i = fillFeatureVector(NGGv);
+            Instance i = fillFeatureVector(NGGv, isSet);
             
             isSet.add(i); 
+        }
+        
+        for (NGGFeatureVector NGGv : vList2) {
+
+            Instance i = fillFeatureVector(NGGv, isSet);
+
+            isSet.add(i);
         }
        
         return isSet;

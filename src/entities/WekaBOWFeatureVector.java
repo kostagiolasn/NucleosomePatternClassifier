@@ -19,49 +19,54 @@ import weka.core.Instances;
 public class WekaBOWFeatureVector implements WekaFeatureVector{
 
     @Override
-    public FastVector initializeWekaFeatureVector() {
+    public ArrayList<Attribute> initializeWekaFeatureVector() {
         
         //Declaration of the numeric value cosSimilarity
         Attribute Attribute1 = new Attribute("cosSimilarity1");
         Attribute Attribute2 = new Attribute("cosSimilarity2");
         //Declare the class attribute along with its values
-        FastVector fvClassVal = new FastVector(2);
-        fvClassVal.addElement("NFR");
-        fvClassVal.addElement("NBS");
+        ArrayList<String> fvClassVal = new ArrayList<>();
+        fvClassVal.add("Nucleosome Free Region");
+        fvClassVal.add("Nucleosome Binding Site");
         Attribute ClassAttribute = new Attribute("theClass", fvClassVal);
         
         //Declare the feature vector
-        FastVector fvWekaAttributesBow = new FastVector(3);
-        fvWekaAttributesBow.addElement(Attribute1);
-        fvWekaAttributesBow.addElement(Attribute2);
-        fvWekaAttributesBow.addElement(ClassAttribute); 
+        ArrayList<Attribute> fvWekaAttributesBow;
+        fvWekaAttributesBow = new ArrayList<>();
+        fvWekaAttributesBow.add(Attribute1);
+        fvWekaAttributesBow.add(Attribute2);
+        fvWekaAttributesBow.add(ClassAttribute); 
         
         return fvWekaAttributesBow;
     }
     
-     public Instance fillFeatureVector(BOWFeatureVector vSource) {
-        Instance i = new DenseInstance(3);
-        FastVector vTarget;
+     public Instance fillFeatureVector(BOWFeatureVector vSource, Instances data) {
+         double[] values = new double[data.numAttributes()];
         
-        WekaHMMFeatureVector v = new WekaHMMFeatureVector();
-        vTarget = v.initializeWekaFeatureVector();
+        values[0] = vSource.getCosSimilarityArrayAtIndex(0);
+        values[1] = vSource.getCosSimilarityArrayAtIndex(1);
+        values[2] = data.attribute(2).indexOfValue(vSource.getLabel());
         
-        i.setValue((Attribute)vTarget.elementAt(0), vSource.getCosSimilarityArrayAtIndex(0) );
-        i.setValue((Attribute)vTarget.elementAt(1), vSource.getCosSimilarityArrayAtIndex(1) );
+        Instance inst = new DenseInstance(1.0, values);
         
-        i.setValue((Attribute)vTarget.elementAt(2), vSource.getLabel() );
-        
-        return i;
+        return inst;
     }
      
-    public Instances fillInstanceSet(ArrayList<BOWFeatureVector> vList) {
+    public Instances fillInstanceSet(ArrayList<BOWFeatureVector> vList, ArrayList<BOWFeatureVector> vList2) {
         FastVector fvWekaAttributesBow = new FastVector(3);
         
         Instances isSet = new Instances(vList.get(0).getLabel(), fvWekaAttributesBow, vList.size());
         
         for (BOWFeatureVector BOWv : vList) {
             
-            Instance i = fillFeatureVector(BOWv);
+            Instance i = fillFeatureVector(BOWv, isSet);
+            
+            isSet.add(i); 
+        }
+        
+        for (BOWFeatureVector BOWv : vList2) {
+            
+            Instance i = fillFeatureVector(BOWv, isSet);
             
             isSet.add(i); 
         }

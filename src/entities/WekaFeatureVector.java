@@ -6,6 +6,7 @@
 package entities;
 
 import java.util.ArrayList;
+import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instances;
 
@@ -14,5 +15,5 @@ import weka.core.Instances;
  * @author nikos
  */
 public interface WekaFeatureVector {
-    public FastVector initializeWekaFeatureVector();
+    public ArrayList<Attribute> initializeWekaFeatureVector();
 }
