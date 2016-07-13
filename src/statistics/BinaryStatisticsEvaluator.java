@@ -21,27 +21,27 @@ public class BinaryStatisticsEvaluator implements StatisticsEvaluator {
     @Override
     public double getAccuracy(double[][] ConfMatrix) {
         //Overall effectiveness of a classifier
-        return ConfMatrix[1][1] + ConfMatrix[0][0] / ConfMatrix[0][0] + ConfMatrix[0][1] + ConfMatrix[1][0] + ConfMatrix[1][1];
+        return (ConfMatrix[1][1] + ConfMatrix[0][0]) / (ConfMatrix[0][0] + ConfMatrix[0][1] + ConfMatrix[1][0] + ConfMatrix[1][1]);
     }
     
     @Override
     public double getPrecision(double[][] ConfMatrix) {
         //Class agreement of the data labels with the positive labels given by the classifier
-        return ConfMatrix[1][1] / ConfMatrix[1][1] + ConfMatrix[0][1];
+        return ConfMatrix[1][1] / (ConfMatrix[1][1] + ConfMatrix[0][1]);
         //return TruePositives / TruePositives + FalsePositives;
     }
     
     @Override
     public double getRecall(double[][] ConfMatrix) {
         //Effectiveness of a classifier to identify positive labels
-        return ConfMatrix[1][1] / ConfMatrix[1][1] + ConfMatrix[1][0];
+        return ConfMatrix[1][1] / (ConfMatrix[1][1] + ConfMatrix[1][0]);
         //return TruePositives / TruePositives + FalseNegatives;
     }
     
     @Override
     public double getSpecificity(double[][] ConfMatrix) {
         //How effectively a classifier identifies negative labels
-        return ConfMatrix[0][0] / ConfMatrix[0][1] + ConfMatrix[0][0];
+        return ConfMatrix[0][0] / (ConfMatrix[0][1] + ConfMatrix[0][0]);
         //return TrueNegatives / FalsePositives + TrueNegatives;
     }
     

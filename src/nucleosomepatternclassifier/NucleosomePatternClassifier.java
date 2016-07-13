@@ -9,9 +9,12 @@ import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
 import entities.HMMFeatureVector;
 import representation.HMM_SequenceAnalyst;
 import entities.HMMSequence;
+import entities.NGGFeatureVector;
 import entities.RepresentationFeatureVector;
 import entities.SequenceInstance;
 import entities.WekaHMMFeatureVector;
+import entities.WekaNGGFeatureVector;
+import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import io.FAFileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,6 +24,8 @@ import java.util.List;
 import representation.GenomicSequenceAnalyst;
 import representation.GenomicSequenceRepresentationHandler;
 import representation.HmmHandler;
+import representation.NGGHandler;
+import representation.NGG_SequenceAnalyst;
 import statistics.BinaryStatisticsEvaluator;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -51,7 +56,8 @@ public class NucleosomePatternClassifier {
         ArrayList<SequenceInstance> NFR_instances = reader.getSequencesFromFile("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets/1099_consistent_NFR.fa");
         ArrayList<SequenceInstance> NBS_instances = reader.getSequencesFromFile("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets/3061_consistent_nucleosomes.fa");        
         
-        GenomicSequenceAnalyst<List<ObservationDiscrete<HMMSequence.Packet>>> analyst = new HMM_SequenceAnalyst();
+        //GenomicSequenceAnalyst<List<ObservationDiscrete<HMMSequence.Packet>>> analyst = new HMM_SequenceAnalyst();
+        NGG_SequenceAnalyst analyst = new NGG_SequenceAnalyst();
         
         int nfolds = 10;
         int evaluations = 10;
@@ -92,49 +98,81 @@ public class NucleosomePatternClassifier {
             }
             
             /* Representing the sequences as HMMs */
-            List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTrainingHMM = analyst.represent(NFR_trainingSeqs);
-            List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTrainingHMM = analyst.represent(NBS_trainingSeqs);
+            //List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTrainingHMM = analyst.represent(NFR_trainingSeqs);
+            //List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTrainingHMM = analyst.represent(NBS_trainingSeqs);
             
             /* The same with the testing sequences */
-            List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTestingHMM = analyst.represent(NFR_testingSeqs);
-            List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTestingHMM = analyst.represent(NBS_testingSeqs);
+            //List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTestingHMM = analyst.represent(NFR_testingSeqs);
+            //List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTestingHMM = analyst.represent(NBS_testingSeqs);
+            
+            /* Representing the sequences as NGGs */
+            List<List<DocumentNGramGraph>> NFRTrainingNGG = analyst.represent(NFR_trainingSeqs);
+            List<List<DocumentNGramGraph>> NBSTrainingNGG = analyst.represent(NBS_trainingSeqs);
+            
+            /* The same with the testing sequences */
+            List<List<DocumentNGramGraph>> NFRTestingNGG = analyst.represent(NFR_testingSeqs);
+            List<List<DocumentNGramGraph>> NBSTestingNGG = analyst.represent(NBS_testingSeqs);
             
             /* We train the two HMMs only by using the training HMM sequences */
             
-            GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>> handler = new HmmHandler();
+            /*GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>> handler = new HmmHandler();
             handler.train(NFRTrainingHMM, "Nucleosome Free Region");
-            handler.train(NBSTrainingHMM, "Nucleosome Binding Site");
+            handler.train(NBSTrainingHMM, "Nucleosome Binding Site");*/
+            
+            /* We train the two NGGs only by using the training NGG sequences */
+            NGGHandler handler = new NGGHandler();
+            handler.train(NFRTrainingNGG, "Nucleosome Free Region");
+            handler.train(NBSTrainingNGG, "Nucleosome Binding Site");
             
             /* Initializing the vectors we want to store */
             
-            ArrayList<HMMFeatureVector> NFRTrainingVectors = new ArrayList<HMMFeatureVector>();
+            /*ArrayList<HMMFeatureVector> NFRTrainingVectors = new ArrayList<HMMFeatureVector>();
             ArrayList<HMMFeatureVector> NBSTrainingVectors = new ArrayList<HMMFeatureVector>();
             
             ArrayList<HMMFeatureVector> NFRTestingVectors = new ArrayList<HMMFeatureVector>();
-            ArrayList<HMMFeatureVector> NBSTestingVectors = new ArrayList<HMMFeatureVector>();
+            ArrayList<HMMFeatureVector> NBSTestingVectors = new ArrayList<HMMFeatureVector>();*/
+            ArrayList<NGGFeatureVector> NFRTrainingVectors = new ArrayList<NGGFeatureVector>();
+            ArrayList<NGGFeatureVector> NBSTrainingVectors = new ArrayList<NGGFeatureVector>();
+            
+            ArrayList<NGGFeatureVector> NFRTestingVectors = new ArrayList<NGGFeatureVector>();
+            ArrayList<NGGFeatureVector> NBSTestingVectors = new ArrayList<NGGFeatureVector>();
             
             /* Getting the feature vectors for each of our sequence lists */
             
-            for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTrainingHMM) {
+            /*for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTrainingHMM) {
                 NFRTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
-            }
-            
+            }  
             for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTrainingHMM) {
                 NBSTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
-            }
-            
+            }   
             for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTestingHMM) {
                 NFRTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
             }
-            
             for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTestingHMM) {
                 NBSTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+            }*/
+            
+            for(List<DocumentNGramGraph> NFRinstanceRepresentation : NFRTrainingNGG) {
+                NFRTrainingVectors.add((NGGFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+            }  
+            for(List<DocumentNGramGraph> NBSinstanceRepresentation : NBSTrainingNGG) {
+                NBSTrainingVectors.add((NGGFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+            }   
+            for(List<DocumentNGramGraph> NFRinstanceRepresentation : NFRTestingNGG) {
+                NFRTestingVectors.add((NGGFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+            }
+            for(List<DocumentNGramGraph> NBSinstanceRepresentation : NBSTestingNGG) {
+                NBSTestingVectors.add((NGGFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
             }
             
             //Get the Weka feature vectors
-            WekaHMMFeatureVector HMMfv= new WekaHMMFeatureVector();
+            /*WekaHMMFeatureVector HMMfv= new WekaHMMFeatureVector();
             Instances Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
-            Instances Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
+            Instances Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);*/
+            
+            WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
+            Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
+            Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
             
             // Perform classification and get Confusion Matrix
             BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();

@@ -8,7 +8,6 @@ package entities;
 import java.util.ArrayList;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
-import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -65,15 +64,10 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
     }
      
     public Instances fillInstanceSet(ArrayList<NGGFeatureVector> vList, ArrayList<NGGFeatureVector> vList2) {
-        FastVector fvWekaAttributesBow = new FastVector(7);
+        ArrayList<Attribute> attributes = initializeWekaFeatureVector();
+        Instances isSet = new Instances(vList.get(0).getLabel(), attributes, vList.size());
         
-        Instances isSet = new Instances(vList.get(0).getLabel(), fvWekaAttributesBow, vList.size());
-        
-        if("NFR".equals(vList.get(0).label)) {
-            isSet.setClassIndex(0);
-        }
-        else
-            isSet.setClassIndex(1);
+        isSet.setClassIndex(isSet.numAttributes() - 1);
         
         for (NGGFeatureVector NGGv : vList) {
             

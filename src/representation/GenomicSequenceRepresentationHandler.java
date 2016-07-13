@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface GenomicSequenceRepresentationHandler<T> {
     public void train(List<T> representation, String label);
-    
+        
     public Object getClassModel();
     
     public Object getFeatureVector(T representation);

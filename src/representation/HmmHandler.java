@@ -9,6 +9,7 @@ import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
 import be.ac.ulg.montefiore.run.jahmm.OpdfDiscrete;
 import be.ac.ulg.montefiore.run.jahmm.OpdfDiscreteFactory;
+import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import entities.HMMFeatureVector;
 import entities.HMMSequence.Packet;
 import java.util.List;
@@ -33,6 +34,11 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
     public void train(List<List<ObservationDiscrete<Packet>>> representation, String label) {
         
         Hmm hmmTemp = initializeHMM();
+        
+        // Train the model based on the observations
+        BaumWelchLearner bwl = new BaumWelchLearner();
+        
+        hmmTemp = bwl.learn(hmmTemp, representation);
         
         classModel.put(label, hmmTemp);
     }

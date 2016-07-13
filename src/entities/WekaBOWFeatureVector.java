@@ -8,7 +8,6 @@ package entities;
 import java.util.ArrayList;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
-import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -53,9 +52,11 @@ public class WekaBOWFeatureVector implements WekaFeatureVector{
     }
      
     public Instances fillInstanceSet(ArrayList<BOWFeatureVector> vList, ArrayList<BOWFeatureVector> vList2) {
-        FastVector fvWekaAttributesBow = new FastVector(3);
         
-        Instances isSet = new Instances(vList.get(0).getLabel(), fvWekaAttributesBow, vList.size());
+        ArrayList<Attribute> attributes = initializeWekaFeatureVector();
+        Instances isSet = new Instances(vList.get(0).getLabel(), attributes, vList.size());
+        
+        isSet.setClassIndex(isSet.numAttributes() - 1);
         
         for (BOWFeatureVector BOWv : vList) {
             

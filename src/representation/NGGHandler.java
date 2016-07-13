@@ -30,7 +30,9 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         DocumentNGramGraph tempGraph = new DocumentNGramGraph();
         
         for(int i = 0; i < representation.size(); i++) {
-            tempGraph.mergeGraph(representation.get(i).get(i), 1/(i+1));
+            for(int j = 0; j < representation.get(i).size(); j++) {
+                tempGraph.mergeGraph(representation.get(i).get(j), 1/(i+1));
+            }
         }
         
         classModel.put(label, tempGraph);
@@ -53,16 +55,16 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         for(String className : classModel.keySet()) {
             DocumentNGramGraph curClassModel = classModel.get(className);
             
-            similarity = comparator.getSimilarityBetween(curClassModel, representation);
+            similarity = comparator.getSimilarityBetween(curClassModel, representation.get(0));
             v.setContainmentSimilarityArrayAtIndex(similarity.ContainmentSimilarity, count);
             v.setSizeSimilarityArrayAtIndex(similarity.SizeSimilarity, count);
             v.setValueSimilarityArrayAtIndex(similarity.ValueSimilarity, count);
             if(count == 0)
                 v.setLabel(className);
-            else {
-                if(v.getContainmentSimilarityArrayAtIndex(0) < v.getContainmentSimilarityArrayAtIndex(1))
+            else if(v.getContainmentSimilarityArrayAtIndex(0) - v.getContainmentSimilarityArrayAtIndex(1) +
+                        v.getSizeSimilarityArrayAtIndex(0) - v.getSizeSimilarityArrayAtIndex(1) + 
+                        v.getValueSimilarityArrayAtIndex(0) - v.getValueSimilarityArrayAtIndex(1) < 0)
                     v.setLabel(className);
-            }
             count++;
         }
         
