@@ -77,8 +77,8 @@ public class NucleosomePatternClassifier {
          List<SequenceInstance> NBS_testingSeqs = null;
         NBS_testingSeqs = new ArrayList();
 
-        for(int i = 0; i < evaluations; i++) {
-            
+        //for(int i = 0; i < evaluations; i++) {
+        for (int i = 0; i < nfolds; i++) {
             /* Initializing the training sequences */
             for(int j = 0; j < (nfolds-1)*NFRpartitionSize; j++) {
                 NFR_trainingSeqs.add(NFR_Seqs.get(j));
@@ -187,8 +187,13 @@ public class NucleosomePatternClassifier {
             
             rotate(NFR_Seqs, NFRpartitionSize);
             rotate(NBS_Seqs, NBSpartitionSize);
+            
+            NFR_trainingSeqs.clear();
+            NBS_trainingSeqs.clear();
+            NFR_testingSeqs.clear();
+            NBS_testingSeqs.clear();
         }
-
+        
        
     }
     

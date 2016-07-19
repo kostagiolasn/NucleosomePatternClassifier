@@ -31,7 +31,7 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         
         for(int i = 0; i < representation.size(); i++) {
             for(int j = 0; j < representation.get(i).size(); j++) {
-                tempGraph.mergeGraph(representation.get(i).get(j), 1/(i+1));
+                tempGraph.mergeGraph(representation.get(i).get(j), 1/((i*j)+1));
             }
         }
         
@@ -61,9 +61,10 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
             v.setValueSimilarityArrayAtIndex(similarity.ValueSimilarity, count);
             if(count == 0)
                 v.setLabel(className);
-            else if(v.getContainmentSimilarityArrayAtIndex(0) - v.getContainmentSimilarityArrayAtIndex(1) +
-                        v.getSizeSimilarityArrayAtIndex(0) - v.getSizeSimilarityArrayAtIndex(1) + 
-                        v.getValueSimilarityArrayAtIndex(0) - v.getValueSimilarityArrayAtIndex(1) < 0)
+            else if(v.getContainmentSimilarityArrayAtIndex(0) - v.getContainmentSimilarityArrayAtIndex(1) //+
+                        //v.getSizeSimilarityArrayAtIndex(0) - v.getSizeSimilarityArrayAtIndex(1) + 
+                        //v.getValueSimilarityArrayAtIndex(0) - v.getValueSimilarityArrayAtIndex(1) < 0)
+                    <0)
                     v.setLabel(className);
             count++;
         }
