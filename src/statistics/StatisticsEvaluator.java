@@ -13,7 +13,7 @@ import weka.core.Instances;
  */
 public interface StatisticsEvaluator {
     
-    public double [][] getConfusionMatrix(Instances Training_Instances, Instances Testing_Instances);
+    public double [][] getConfusionMatrix(Instances Training_Instances, Instances Testing_Instances, String classifier);
     
     public double getAccuracy(double[][] ConfMatrix);
     

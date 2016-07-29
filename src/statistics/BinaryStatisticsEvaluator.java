@@ -10,8 +10,11 @@ import java.util.logging.Logger;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.lazy.IBk;
+import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.pmml.jaxbbindings.SupportVectorMachineModel;
 
 /**
  *
@@ -57,18 +60,42 @@ public class BinaryStatisticsEvaluator implements StatisticsEvaluator {
     }
 
     @Override
-    public double [][] getConfusionMatrix(Instances Training_Instances, Instances Testing_Instances) {
+    public double [][] getConfusionMatrix(Instances Training_Instances, Instances Testing_Instances, String classifier) {
             
-            
-            Classifier cModel = (Classifier)new NaiveBayes();
-            //Classifier cModel = (Classifier)new RandomForest();
-            //Classifier cModel = (Classifier)new SupportVectorMachineModel();s
-            try {
+            Classifier cModel = null;
+            if("NB".equals(classifier)) {
+               cModel = (Classifier)new NaiveBayes();
+               try {
                 cModel.buildClassifier(Training_Instances);
-            } catch (Exception ex) {
-                Logger.getLogger(BinaryStatisticsEvaluator.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(BinaryStatisticsEvaluator.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            
+            else if("DT".equals(classifier)) {
+                cModel = (Classifier)new J48();
+                try {
+                cModel.buildClassifier(Training_Instances);
+                } catch (Exception ex) {
+                    Logger.getLogger(BinaryStatisticsEvaluator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else if("SVM".equals(classifier)) {
+                cModel = (Classifier)new SupportVectorMachineModel();
+                
+                try {
+                cModel.buildClassifier(Training_Instances);
+                } catch (Exception ex) {
+                    Logger.getLogger(BinaryStatisticsEvaluator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else if("KNN".equals(classifier)) {
+                cModel = (Classifier)new IBk();
+                try {
+                cModel.buildClassifier(Training_Instances);
+                } catch (Exception ex) {
+                    Logger.getLogger(BinaryStatisticsEvaluator.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             //Test the model
             Evaluation eTest;
         try {
