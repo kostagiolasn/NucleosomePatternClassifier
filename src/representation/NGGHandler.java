@@ -8,6 +8,7 @@ package representation;
 import entities.NGGFeatureVector;
 import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
+import gr.demokritos.iit.jinsect.events.GraphSimilarityComparatorAdapter;
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         
         for(int i = 0; i < representation.size(); i++) {
             for(int j = 0; j < representation.get(i).size(); j++) {
-                tempGraph.mergeGraph(representation.get(i).get(j), 1/((i*j)+1));
+                tempGraph.mergeGraph(representation.get(i).get(j), 1/((i+1)*(j+1)));
             }
         }
         
@@ -44,7 +45,7 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
     }
 
     @Override
-    public Object getFeatureVector(List<DocumentNGramGraph> representation) {
+    public Object getFeatureVector(List<DocumentNGramGraph> representation, String label) {
         
         NGGFeatureVector v = new NGGFeatureVector();
         
@@ -53,21 +54,28 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         int count = 0;
         
         for(String className : classModel.keySet()) {
+            //System.out.println(className);
             DocumentNGramGraph curClassModel = classModel.get(className);
             
             similarity = comparator.getSimilarityBetween(curClassModel, representation.get(0));
             v.setContainmentSimilarityArrayAtIndex(similarity.ContainmentSimilarity, count);
             v.setSizeSimilarityArrayAtIndex(similarity.SizeSimilarity, count);
             v.setValueSimilarityArrayAtIndex(similarity.ValueSimilarity, count);
-            if(count == 0)
+            
+            //System.out.println("This is class of index " + count + " with ContainmentSimilarity " + v.getContainmentSimilarityArrayAtIndex(count) +
+              //      " SizeSimilarity " + v.getSizeSimilarityArrayAtIndex(count) + " ValueSimilarity " + v.getValueSimilarityArrayAtIndex(count) +
+                //    " OverallSimilarity " + similarity.getOverallSimilarity());
+            /*if(count == 0)
                 v.setLabel(className);
-            else if(v.getContainmentSimilarityArrayAtIndex(0) - v.getContainmentSimilarityArrayAtIndex(1) //+
-                        //v.getSizeSimilarityArrayAtIndex(0) - v.getSizeSimilarityArrayAtIndex(1) + 
-                        //v.getValueSimilarityArrayAtIndex(0) - v.getValueSimilarityArrayAtIndex(1) < 0)
-                    <0)
+            else if(//v.getContainmentSimilarityArrayAtIndex(0) - v.getContainmentSimilarityArrayAtIndex(1) +
+                        //v.getSizeSimilarityArrayAtIndex(0) - v.getSizeSimilarityArrayAtIndex(1) +
+                       v.getValueSimilarityArrayAtIndex(0) - v.getValueSimilarityArrayAtIndex(1)
+                    < 0)
                     v.setLabel(className);
+                    */
             count++;
         }
+        v.setLabel(label);
         
         return v;
     

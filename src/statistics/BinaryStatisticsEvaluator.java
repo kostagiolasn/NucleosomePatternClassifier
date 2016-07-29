@@ -53,7 +53,7 @@ public class BinaryStatisticsEvaluator implements StatisticsEvaluator {
 
     @Override
     public double getfScore(double[][] ConfMatrix) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return 2* this.getAccuracy(ConfMatrix) * this.getPrecision(ConfMatrix) / (this.getAccuracy(ConfMatrix) + this.getPrecision(ConfMatrix)); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

@@ -17,5 +17,5 @@ public interface GenomicSequenceRepresentationHandler<T> {
         
     public Object getClassModel();
     
-    public Object getFeatureVector(T representation);
+    public Object getFeatureVector(T representation, String className);
 }

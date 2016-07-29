@@ -28,21 +28,20 @@ public class BOWHandler implements GenomicSequenceRepresentationHandler<List<Bag
         
         BagOfWords classBoW = new BagOfWords();
             
-        for(int i = 0; i < representation.size(); i++) {
-            BagOfWords tempBoW = representation.get(i).get(i);
-            
-            for(String a : tempBoW.getBowMap().keySet()) {
+        for (List<BagOfWords> representation1 : representation) {
+            for (BagOfWords tempBoW : representation1) {
+                for(String a : tempBoW.getBowMap().keySet()) {
 
-                if(!classBoW.getBowMap().containsKey(a)) {
-                    classBoW.getBowMap().put(a, tempBoW.getBowMap().get(a));
+                    if(!classBoW.getBowMap().containsKey(a)) {
+                        classBoW.getBowMap().put(a, tempBoW.getBowMap().get(a));
+                    }
+                    else
+                        classBoW.getBowMap().put(a, classBoW.getBowMap().get(a) + tempBoW.getBowMap().get(a));
                 }
-                else
-                    classBoW.getBowMap().put(a, classBoW.getBowMap().get(a) + tempBoW.getBowMap().get(a));
             }
-
         }
         
-        classModel.put(label, null);
+        classModel.put(label, classBoW);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class BOWHandler implements GenomicSequenceRepresentationHandler<List<Bag
 
 
     @Override
-    public Object getFeatureVector(List<BagOfWords> representation) {
+    public Object getFeatureVector(List<BagOfWords> representation, String label) {
         
         BOWFeatureVector v = new BOWFeatureVector();
         
@@ -73,14 +72,15 @@ public class BOWHandler implements GenomicSequenceRepresentationHandler<List<Bag
             
             v.setCosSimilarityArrayAtIndex(tempCosSimilarity, count);
             
-            if(count == 0)
+            /*if(count == 0)
                 v.setLabel(className);
             else {
                 if(v.getCosSimilarityArrayAtIndex(0) < v.getCosSimilarityArrayAtIndex(1))
                     v.setLabel(className);
-            }
+            }*/
             count++;
         }
+        v.setLabel(label);
         return v;
     }
     

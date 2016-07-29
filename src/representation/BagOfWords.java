@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author nikos
  */
-class BagOfWords {
+public class BagOfWords {
     
     private final HashMap<String, Integer> BowMap;
 

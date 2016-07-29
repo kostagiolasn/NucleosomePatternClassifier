@@ -6,12 +6,14 @@
 package nucleosomepatternclassifier;
 
 import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
+import entities.BOWFeatureVector;
 import entities.HMMFeatureVector;
 import representation.HMM_SequenceAnalyst;
 import entities.HMMSequence;
 import entities.NGGFeatureVector;
 import entities.RepresentationFeatureVector;
 import entities.SequenceInstance;
+import entities.WekaBOWFeatureVector;
 import entities.WekaHMMFeatureVector;
 import entities.WekaNGGFeatureVector;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
@@ -21,6 +23,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import static java.util.Collections.rotate;
 import java.util.List;
+import representation.BOWHandler;
+import representation.BOW_SequenceAnalyst;
+import representation.BagOfWords;
 import representation.GenomicSequenceAnalyst;
 import representation.GenomicSequenceRepresentationHandler;
 import representation.HmmHandler;
@@ -57,7 +62,8 @@ public class NucleosomePatternClassifier {
         ArrayList<SequenceInstance> NBS_instances = reader.getSequencesFromFile("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets/3061_consistent_nucleosomes.fa");        
         
         //GenomicSequenceAnalyst<List<ObservationDiscrete<HMMSequence.Packet>>> analyst = new HMM_SequenceAnalyst();
-        NGG_SequenceAnalyst analyst = new NGG_SequenceAnalyst();
+        //NGG_SequenceAnalyst analyst = new NGG_SequenceAnalyst();
+        BOW_SequenceAnalyst analyst = new BOW_SequenceAnalyst();
         
         int nfolds = 10;
         int evaluations = 10;
@@ -106,12 +112,20 @@ public class NucleosomePatternClassifier {
             //List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTestingHMM = analyst.represent(NBS_testingSeqs);
             
             /* Representing the sequences as NGGs */
-            List<List<DocumentNGramGraph>> NFRTrainingNGG = analyst.represent(NFR_trainingSeqs);
-            List<List<DocumentNGramGraph>> NBSTrainingNGG = analyst.represent(NBS_trainingSeqs);
+            //List<List<DocumentNGramGraph>> NFRTrainingNGG = analyst.represent(NFR_trainingSeqs);
+            //List<List<DocumentNGramGraph>> NBSTrainingNGG = analyst.represent(NBS_trainingSeqs);
             
             /* The same with the testing sequences */
-            List<List<DocumentNGramGraph>> NFRTestingNGG = analyst.represent(NFR_testingSeqs);
-            List<List<DocumentNGramGraph>> NBSTestingNGG = analyst.represent(NBS_testingSeqs);
+            //List<List<DocumentNGramGraph>> NFRTestingNGG = analyst.represent(NFR_testingSeqs);
+            //List<List<DocumentNGramGraph>> NBSTestingNGG = analyst.represent(NBS_testingSeqs);
+            
+            /* Representing the sequences as BOWs */
+            List<List<BagOfWords>> NFRTrainingBOW = analyst.represent(NFR_trainingSeqs);
+            List<List<BagOfWords>> NBSTrainingBOW = analyst.represent(NBS_trainingSeqs);
+            
+            /* The same with the testing sequences */
+            List<List<BagOfWords>> NFRTestingBOW = analyst.represent(NFR_testingSeqs);
+            List<List<BagOfWords>> NBSTestingBOW = analyst.represent(NBS_testingSeqs);
             
             /* We train the two HMMs only by using the training HMM sequences */
             
@@ -120,9 +134,15 @@ public class NucleosomePatternClassifier {
             handler.train(NBSTrainingHMM, "Nucleosome Binding Site");*/
             
             /* We train the two NGGs only by using the training NGG sequences */
-            NGGHandler handler = new NGGHandler();
+            
+            /*NGGHandler handler = new NGGHandler();
             handler.train(NFRTrainingNGG, "Nucleosome Free Region");
-            handler.train(NBSTrainingNGG, "Nucleosome Binding Site");
+            handler.train(NBSTrainingNGG, "Nucleosome Binding Site*/
+            
+            /* We train the two NGGs only by using the training NGG sequences */
+            BOWHandler handler = new BOWHandler();
+            handler.train(NFRTrainingBOW, "Nucleosome Free Region");
+            handler.train(NBSTrainingBOW, "Nucleosome Binding Site");
             
             /* Initializing the vectors we want to store */
             
@@ -131,38 +151,63 @@ public class NucleosomePatternClassifier {
             
             ArrayList<HMMFeatureVector> NFRTestingVectors = new ArrayList<HMMFeatureVector>();
             ArrayList<HMMFeatureVector> NBSTestingVectors = new ArrayList<HMMFeatureVector>();*/
-            ArrayList<NGGFeatureVector> NFRTrainingVectors = new ArrayList<NGGFeatureVector>();
+            
+            
+            /*ArrayList<NGGFeatureVector> NFRTrainingVectors = new ArrayList<NGGFeatureVector>();
             ArrayList<NGGFeatureVector> NBSTrainingVectors = new ArrayList<NGGFeatureVector>();
             
             ArrayList<NGGFeatureVector> NFRTestingVectors = new ArrayList<NGGFeatureVector>();
-            ArrayList<NGGFeatureVector> NBSTestingVectors = new ArrayList<NGGFeatureVector>();
+            ArrayList<NGGFeatureVector> NBSTestingVectors = new ArrayList<NGGFeatureVector>();*/
+            
+            ArrayList<BOWFeatureVector> NFRTrainingVectors = new ArrayList<BOWFeatureVector>();
+            ArrayList<BOWFeatureVector> NBSTrainingVectors = new ArrayList<BOWFeatureVector>();
+            
+            ArrayList<BOWFeatureVector> NFRTestingVectors = new ArrayList<BOWFeatureVector>();
+            ArrayList<BOWFeatureVector> NBSTestingVectors = new ArrayList<BOWFeatureVector>();
             
             /* Getting the feature vectors for each of our sequence lists */
             
             /*for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTrainingHMM) {
-                NFRTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+                NFRTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
             }  
             for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTrainingHMM) {
-                NBSTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+                NBSTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
             }   
             for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTestingHMM) {
-                NFRTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+                NFRTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
             }
             for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTestingHMM) {
-                NBSTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+                NBSTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
             }*/
             
+            /*System.out.println("Handling NFR");
             for(List<DocumentNGramGraph> NFRinstanceRepresentation : NFRTrainingNGG) {
-                NFRTrainingVectors.add((NGGFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+                NFRTrainingVectors.add((NGGFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
             }  
+            System.out.println("Handling NBS");
             for(List<DocumentNGramGraph> NBSinstanceRepresentation : NBSTrainingNGG) {
-                NBSTrainingVectors.add((NGGFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+                NBSTrainingVectors.add((NGGFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
             }   
             for(List<DocumentNGramGraph> NFRinstanceRepresentation : NFRTestingNGG) {
-                NFRTestingVectors.add((NGGFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation));
+                NFRTestingVectors.add((NGGFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
             }
             for(List<DocumentNGramGraph> NBSinstanceRepresentation : NBSTestingNGG) {
-                NBSTestingVectors.add((NGGFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation));
+                NBSTestingVectors.add((NGGFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
+            }*/
+            
+            System.out.println("Handling NFR");
+            for(List<BagOfWords> NFRinstanceRepresentation : NFRTrainingBOW) {
+                NFRTrainingVectors.add((BOWFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
+            }  
+            System.out.println("Handling NBS");
+            for(List<BagOfWords> NBSinstanceRepresentation : NBSTrainingBOW) {
+                NBSTrainingVectors.add((BOWFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
+            }   
+            for(List<BagOfWords> NFRinstanceRepresentation : NFRTestingBOW) {
+                NFRTestingVectors.add((BOWFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
+            }
+            for(List<BagOfWords> NBSinstanceRepresentation : NBSTestingBOW) {
+                NBSTestingVectors.add((BOWFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
             }
             
             //Get the Weka feature vectors
@@ -170,7 +215,11 @@ public class NucleosomePatternClassifier {
             Instances Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
             Instances Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);*/
             
-            WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
+            /*WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
+            Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
+            Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);*/
+            
+            WekaBOWFeatureVector NGGfv= new WekaBOWFeatureVector();
             Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
             Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
             
