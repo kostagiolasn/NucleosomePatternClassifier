@@ -5,11 +5,14 @@
  */
 package entities;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.converters.ArffSaver;
 
 /**
  *
@@ -63,7 +66,7 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
         return inst;
     }
      
-    public Instances fillInstanceSet(ArrayList<NGGFeatureVector> vList, ArrayList<NGGFeatureVector> vList2) {
+    public Instances fillInstanceSet(ArrayList<NGGFeatureVector> vList, ArrayList<NGGFeatureVector> vList2) throws IOException {
         ArrayList<Attribute> attributes = initializeWekaFeatureVector();
         Instances isSet = new Instances(vList.get(0).getLabel(), attributes, vList.size());
         
@@ -82,6 +85,11 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
 
             isSet.add(i);
         }
+        
+        ArffSaver saver = new ArffSaver();
+        saver.setInstances(isSet);
+        saver.setFile(new File("./data/test.arff"));
+        saver.writeBatch();
        
         return isSet;
     }

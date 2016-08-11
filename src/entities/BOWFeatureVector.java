@@ -15,9 +15,11 @@ public class BOWFeatureVector implements RepresentationFeatureVector {
 
     String label;
     ArrayList<Double> cosSimilarityArray;
+    ArrayList<String> Bag;
 
     public BOWFeatureVector() {
        cosSimilarityArray = new ArrayList<>();
+       Bag = new ArrayList<>();
     }
 
     @Override
@@ -36,6 +38,19 @@ public class BOWFeatureVector implements RepresentationFeatureVector {
 
     public void setCosSimilarityArrayAtIndex(double element, int index) {
         this.cosSimilarityArray.add(index, element);
+    }
+    
+    public ArrayList<String> getBag() {
+        return Bag;
+    }
+
+    public void setBag(ArrayList<String> TBag) {
+        Bag = new ArrayList<>(TBag);
+    }
+    
+    public void addToBag(String string) {
+        if(!(Bag.contains(string)))
+            Bag.add(string);
     }
 
 }

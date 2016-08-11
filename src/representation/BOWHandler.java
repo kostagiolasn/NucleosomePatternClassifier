@@ -6,6 +6,7 @@
 package representation;
 
 import entities.BOWFeatureVector;
+import static java.lang.Math.sqrt;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -59,8 +60,22 @@ public class BOWHandler implements GenomicSequenceRepresentationHandler<List<Bag
         
         for(String className : classModel.keySet()) {
             BagOfWords curClassModel = classModel.get(className);
+
             
             double tempCosSimilarity = 0.0;
+            double sumA = 0.0;
+            double sumB = 0.0;
+            
+            for(String a : curClassModel.getBowMap().keySet()) {
+                sumA += curClassModel.getBowMap().get(a);
+            }
+            
+            for (BagOfWords temp : representation) {
+                for(String a : temp.getBowMap().keySet()) {
+                    sumB += temp.getBowMap().get(a);
+                    v.addToBag(a);
+                }
+            }
             
             for(String a : curClassModel.getBowMap().keySet()) {
                 for (BagOfWords temp : representation) {
@@ -70,6 +85,7 @@ public class BOWHandler implements GenomicSequenceRepresentationHandler<List<Bag
                 }
             }
             
+            tempCosSimilarity = tempCosSimilarity / (sqrt(sumA) * sqrt(sumB));
             v.setCosSimilarityArrayAtIndex(tempCosSimilarity, count);
             
             /*if(count == 0)

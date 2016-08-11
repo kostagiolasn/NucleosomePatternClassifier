@@ -10,12 +10,10 @@ import java.util.logging.Logger;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.functions.SMO;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.trees.J48;
-import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.pmml.jaxbbindings.SupportVectorMachineModel;
-
 /**
  *
  * @author nikos
@@ -80,7 +78,7 @@ public class BinaryStatisticsEvaluator implements StatisticsEvaluator {
                 }
             }
             else if("SVM".equals(classifier)) {
-                cModel = (Classifier)new SupportVectorMachineModel();
+                cModel = (Classifier)new SMO();
                 
                 try {
                 cModel.buildClassifier(Training_Instances);
@@ -104,6 +102,10 @@ public class BinaryStatisticsEvaluator implements StatisticsEvaluator {
             //Print the result
             String strSummary = eTest.toSummaryString();
             System.out.println(strSummary);
+            String strSummary1 = eTest.toMatrixString();
+            System.out.println(strSummary1);
+            String strSummary2 = eTest.toClassDetailsString();
+            System.out.println(strSummary2);
             
             //Get the confusion matrix
             double [][] cmMatrix = eTest.confusionMatrix();

@@ -87,7 +87,7 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
                 //label = className;
                 //v.setLabel(label);
             }
-            v.setProbArrayAtIndex(dMaxProb, count);
+            v.setProbArrayAtIndex(dProb, count);
             count++;
         }
         v.setLabel(label);

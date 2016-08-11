@@ -16,7 +16,9 @@ import entities.WekaHMMFeatureVector;
 import entities.WekaNGGFeatureVector;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import io.FAFileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import static java.util.Collections.rotate;
 import java.util.List;
 import representation.BOWHandler;
@@ -36,10 +38,12 @@ import weka.core.Instances;
  * @author nikos
  */
 public class RunHandler {
-    public void run(String NFR_pathfile, String NBS_pathfile, String folds, String representation_type, String classifier_type) {
+    public void run(String NFR_pathfile, String NBS_pathfile, String folds, String representation_type, String classifier_type) throws IOException {
         FAFileReader reader = new FAFileReader();
-        ArrayList<SequenceInstance> NFR_instances = reader.getSequencesFromFile("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets/1099_consistent_NFR.fa");
-        ArrayList<SequenceInstance> NBS_instances = reader.getSequencesFromFile("/home/nikos/NetBeansProjects/NucleosomePatternClassifier/Datasets/3061_consistent_nucleosomes.fa");        
+        ArrayList<SequenceInstance> NFR_instances = reader.getSequencesFromFile(NFR_pathfile);
+        ArrayList<SequenceInstance> NBS_instances = reader.getSequencesFromFile(NBS_pathfile);        
+        
+       // ArrayList<SequenceInstance> NBS_instances = new ArrayList<>(temp_NBS_instances.subList(0, NFR_instances.size()));
         
         GenomicSequenceAnalyst<List<ObservationDiscrete<HMMSequence.Packet>>> hmm_analyst = new HMM_SequenceAnalyst();
         NGG_SequenceAnalyst ngg_analyst = new NGG_SequenceAnalyst();
@@ -130,10 +134,11 @@ public class RunHandler {
 
                 // Print results
                 System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
-                System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));;
+                System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));
                 System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
                 System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
                 System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
+                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
 
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);
@@ -188,6 +193,8 @@ public class RunHandler {
                 
                 // Perform classification and get Confusion Matrix
                 BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
+                Collections.shuffle(Training_Instances);
+                Collections.shuffle(Testing_Instances);
                 double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances, classifier_type);
 
                 // Print results
@@ -196,6 +203,7 @@ public class RunHandler {
                 System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
                 System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
                 System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
+                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
 
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);
@@ -256,6 +264,8 @@ public class RunHandler {
                 System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
                 System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
                 System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
+                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+
 
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);

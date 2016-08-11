@@ -5,12 +5,15 @@
  */
 package entities;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.converters.ArffSaver;
 
 /**
  *
@@ -41,27 +44,22 @@ public class WekaHMMFeatureVector implements WekaFeatureVector {
 
     public Instance fillFeatureVector(HMMFeatureVector vSource, Instances data) {
         double[] values = new double[data.numAttributes()];
+        double min_prob;
         
-        values[0] = vSource.getProbArrayAtIndex(0);
-        values[1] = vSource.getProbArrayAtIndex(1);
+        values[0] = vSource.getProbArrayAtIndex(0)/((vSource.getProbArrayAtIndex(0) + vSource.getProbArrayAtIndex(1)) / 2);
+        values[1] = vSource.getProbArrayAtIndex(1)/((vSource.getProbArrayAtIndex(0) + vSource.getProbArrayAtIndex(1)) / 2);
         values[2] = data.attribute(2).indexOfValue(vSource.getLabel());
         
         Instance inst = new DenseInstance(1.0, values);
-
-       // i.setValue((Attribute) vTarget.elementAt(0), vSource.getProbArrayAtIndex(0));
-        //i.setValue((Attribute) vTarget.elementAt(1), vSource.getProbArrayAtIndex(1));
-
-        //i.setValue((Attribute) vTarget.elementAt(2), vSource.getLabel());
-
         return inst;
     }
 
-    public Instances fillInstanceSet(ArrayList<HMMFeatureVector> vList, ArrayList<HMMFeatureVector> vList2) {
+    public Instances fillInstanceSet(ArrayList<HMMFeatureVector> vList, ArrayList<HMMFeatureVector> vList2) throws IOException {
 
         //FastVector fvWekaAttributesHmm = new FastVector(3);
 
         ArrayList<Attribute> attributes = initializeWekaFeatureVector();
-        Instances isSet = new Instances(vList.get(0).getLabel(), attributes, vList.size());
+        Instances isSet = new Instances("dataset", attributes, vList.size());
 
         isSet.setClassIndex(isSet.numAttributes() - 1);
 
@@ -78,6 +76,11 @@ public class WekaHMMFeatureVector implements WekaFeatureVector {
 
             isSet.add(i);
         }
+        
+        ArffSaver saver = new ArffSaver();
+        saver.setInstances(isSet);
+        saver.setFile(new File("./data/test.arff"));
+        saver.writeBatch();
 
         return isSet;
     }
