@@ -19,11 +19,13 @@ public class NGGFeatureVector implements RepresentationFeatureVector{
     ArrayList <Double> containmentSimilarityArray;
     ArrayList <Double> sizeSimilarityArray;
     ArrayList <Double> valueSimilarityArray;
+    ArrayList <Double> nvsArray;
 
     public NGGFeatureVector() {
         containmentSimilarityArray = new ArrayList<>();
         sizeSimilarityArray = new ArrayList<>();
         valueSimilarityArray = new ArrayList<>();
+        nvsArray = new ArrayList<>();
     }
     
     
@@ -59,6 +61,14 @@ public class NGGFeatureVector implements RepresentationFeatureVector{
     
     public void setValueSimilarityArrayAtIndex(double element, int index) {
         this.valueSimilarityArray.add(index, element);
+    }
+    
+     public double getNVSArrayAtIndex(int index) {
+        return nvsArray.get(index);
+    }
+    
+    public void setNVSArrayAtIndex(double element, int index) {
+        this.nvsArray.add(index, element);
     }
     
 }

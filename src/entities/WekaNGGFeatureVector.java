@@ -26,9 +26,11 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
         Attribute Attribute1 = new Attribute("containmentSimilarity1");
         Attribute Attribute2 = new Attribute("sizeSimilarity1");
         Attribute Attribute3 = new Attribute("valueSimilarity1");
-        Attribute Attribute4 = new Attribute("containmentSimilarity2");
-        Attribute Attribute5 = new Attribute("sizeSimilarity2");
-        Attribute Attribute6 = new Attribute("valueSimilarity2");
+        Attribute Attribute4 = new Attribute("nvsSimilarity1");
+        Attribute Attribute5 = new Attribute("containmentSimilarity2");
+        Attribute Attribute6 = new Attribute("sizeSimilarity2");
+        Attribute Attribute7 = new Attribute("valueSimilarity2");
+        Attribute Attribute8 = new Attribute("nvsSimilarity2");
         //Declare the class attribute along with its values
         ArrayList<String> fvClassVal = new ArrayList<>();
         fvClassVal.add("Nucleosome Free Region");
@@ -44,6 +46,8 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
         fvWekaAttributesNgg.add(Attribute4);
         fvWekaAttributesNgg.add(Attribute5);
         fvWekaAttributesNgg.add(Attribute6);
+        fvWekaAttributesNgg.add(Attribute7);
+        fvWekaAttributesNgg.add(Attribute8);
         fvWekaAttributesNgg.add(ClassAttribute); 
         
         return fvWekaAttributesNgg;
@@ -54,19 +58,21 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
         double[] values = new double[data.numAttributes()];
         
         values[0] = vSource.getContainmentSimilarityArrayAtIndex(0);
-        values[1] = vSource.getContainmentSimilarityArrayAtIndex(1);
-        values[2] = vSource.getSizeSimilarityArrayAtIndex(0);
-        values[3] = vSource.getSizeSimilarityArrayAtIndex(1);
-        values[4] = vSource.getValueSimilarityArrayAtIndex(0);
-        values[5] = vSource.getValueSimilarityArrayAtIndex(1);
-        values[6] = data.attribute(6).indexOfValue(vSource.getLabel());
+        values[1] = vSource.getSizeSimilarityArrayAtIndex(0);
+        values[2] = vSource.getValueSimilarityArrayAtIndex(0);
+        values[3] = vSource.getNVSArrayAtIndex(0);
+        values[4] = vSource.getContainmentSimilarityArrayAtIndex(1);
+        values[5] = vSource.getSizeSimilarityArrayAtIndex(1);
+        values[6] = vSource.getValueSimilarityArrayAtIndex(1);
+        values[7] = vSource.getNVSArrayAtIndex(1);
+        values[8] = data.attribute(8).indexOfValue(vSource.getLabel());
         
         Instance inst = new DenseInstance(1.0, values);
         
         return inst;
     }
      
-    public Instances fillInstanceSet(ArrayList<NGGFeatureVector> vList, ArrayList<NGGFeatureVector> vList2) throws IOException {
+    public Instances fillInstanceSet(ArrayList<NGGFeatureVector> vList, ArrayList<NGGFeatureVector> vList2, String datasetType) throws IOException {
         ArrayList<Attribute> attributes = initializeWekaFeatureVector();
         Instances isSet = new Instances(vList.get(0).getLabel(), attributes, vList.size());
         
@@ -88,7 +94,7 @@ public class WekaNGGFeatureVector implements WekaFeatureVector{
         
         ArffSaver saver = new ArffSaver();
         saver.setInstances(isSet);
-        saver.setFile(new File("./data/test.arff"));
+        saver.setFile(new File("./data/"+datasetType+".arff"));
         saver.writeBatch();
        
         return isSet;

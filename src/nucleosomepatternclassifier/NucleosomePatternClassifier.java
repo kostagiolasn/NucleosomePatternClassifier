@@ -41,6 +41,18 @@ public class NucleosomePatternClassifier {
         over the folds for use in n-fold cross-validation. For each iteration, list[0] contains an InstanceList
         with n-1 filds typically used for training and list[1] contains an InstanceList with 1 folds typically
         used for validation.
+        
+        Run as : -NFR <path_to_NFR_fasta_file> -NBS <path_to_NBS_file> -folds <number_of_folds> -rep <representation_type(see below)> -clf <classifier(see below)>
+        >>> representation types
+        <BOW> : Bag of Words
+        <NGG> : N-gram graphs
+        <HMM> : Hidden Markov Models
+        
+        >> classifier types
+        <NB> : Naive Bayes
+        <SVM> : Support Vector Machine
+        <DT> : Decision Tree
+        <KNN> : K-nearest neighbors
         */
         
         RunHandler run = new RunHandler();

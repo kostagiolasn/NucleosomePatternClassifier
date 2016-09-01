@@ -188,8 +188,8 @@ public class RunHandler {
                 }
                 
                 WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
-                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
-                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
+                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors, "training");
+                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors, "testing");
                 
                 // Perform classification and get Confusion Matrix
                 BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();

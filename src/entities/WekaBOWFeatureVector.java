@@ -45,8 +45,8 @@ public class WekaBOWFeatureVector implements WekaFeatureVector{
      public Instance fillFeatureVector(BOWFeatureVector vSource, Instances data) {
          double[] values = new double[data.numAttributes()];
         
-        values[0] = vSource.getCosSimilarityArrayAtIndex(0)/((vSource.getCosSimilarityArrayAtIndex(0) + vSource.getCosSimilarityArrayAtIndex(1)) / 4);
-        values[1] = vSource.getCosSimilarityArrayAtIndex(1)/((vSource.getCosSimilarityArrayAtIndex(0) + vSource.getCosSimilarityArrayAtIndex(1)) / 2);
+        values[0] = vSource.getCosSimilarityArrayAtIndex(0);//((vSource.getCosSimilarityArrayAtIndex(0) + vSource.getCosSimilarityArrayAtIndex(1)));
+        values[1] = vSource.getCosSimilarityArrayAtIndex(1);//((vSource.getCosSimilarityArrayAtIndex(0) + vSource.getCosSimilarityArrayAtIndex(1)));
         values[2] = data.attribute(2).indexOfValue(vSource.getLabel());
         
         Instance inst = new DenseInstance(1.0, values);
