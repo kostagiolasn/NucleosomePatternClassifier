@@ -33,7 +33,7 @@ public class NGGHandler implements GenomicSequenceRepresentationHandler<List<Doc
         
         for(int i = 0; i < representation.size()*0.9; i++) {
             for(int j = 0; j < representation.get(i).size(); j++) {
-                tempGraph.mergeGraph(representation.get(i).get(j), 1/(iCount + 1));
+                tempGraph.mergeGraph(representation.get(i).get(j), 1.0/((double)iCount + 1.0));
                 iCount++;
             }
         }

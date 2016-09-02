@@ -5,21 +5,9 @@
  */
 package nucleosomepatternclassifier;
 
-import entities.BOWFeatureVector;
-import entities.SequenceInstance;
-import entities.WekaBOWFeatureVector;
-import io.FAFileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import static java.util.Collections.rotate;
-import java.util.List;
-import representation.BOWHandler;
-import representation.BOW_SequenceAnalyst;
-import representation.BagOfWords;
 import run.RunHandler;
-import statistics.BinaryStatisticsEvaluator;
-import weka.core.Instances;
 
 /**
  *

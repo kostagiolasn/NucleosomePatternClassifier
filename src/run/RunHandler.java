@@ -16,6 +16,7 @@ import entities.WekaHMMFeatureVector;
 import entities.WekaNGGFeatureVector;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import io.FAFileReader;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import representation.NGGHandler;
 import representation.NGG_SequenceAnalyst;
 import statistics.BinaryStatisticsEvaluator;
 import weka.core.Instances;
+import weka.core.converters.ArffSaver;
 
 /**
  *
@@ -78,7 +80,7 @@ public class RunHandler {
             
             /* Initializing the testing sequences */
             for(int j = (nfolds-1)*NFRpartitionSize; j < NFR_Seqs.size(); j++) {
-                NFR_testingSeqs.add(NBS_Seqs.get(j));
+                NFR_testingSeqs.add(NFR_Seqs.get(j));
             }
             
             for(int j = (nfolds-1)*NBSpartitionSize; j < NBS_Seqs.size(); j++) {
@@ -166,11 +168,11 @@ public class RunHandler {
                                 
                 /* Initializing the vectors we want to store */
                 
-                ArrayList<NGGFeatureVector> NFRTrainingVectors = new ArrayList<NGGFeatureVector>();
-                ArrayList<NGGFeatureVector> NBSTrainingVectors = new ArrayList<NGGFeatureVector>();
+                ArrayList<NGGFeatureVector> NFRTrainingVectors = new ArrayList<>();
+                ArrayList<NGGFeatureVector> NBSTrainingVectors = new ArrayList<>();
 
-                ArrayList<NGGFeatureVector> NFRTestingVectors = new ArrayList<NGGFeatureVector>();
-                ArrayList<NGGFeatureVector> NBSTestingVectors = new ArrayList<NGGFeatureVector>();
+                ArrayList<NGGFeatureVector> NFRTestingVectors = new ArrayList<>();
+                ArrayList<NGGFeatureVector> NBSTestingVectors = new ArrayList<>();
                 
                 /* Getting the feature vectors for each of our sequence lists */
                 
@@ -190,6 +192,23 @@ public class RunHandler {
                 WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
                 Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors, "training");
                 Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors, "testing");
+                
+                // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
+                try {
+                    ArffSaver asSaver = new ArffSaver();
+                    asSaver.setInstances(Training_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
+                    asSaver.writeBatch();
+
+                    asSaver.setInstances(Testing_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
+                    asSaver.writeBatch();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                    System.out.println("Could not output fold ARFF files "
+                            + "(perhaps ARFF directory is missing?). "
+                            + "Skipping...");
+                }
                 
                 // Perform classification and get Confusion Matrix
                 BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
