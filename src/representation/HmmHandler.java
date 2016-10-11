@@ -51,8 +51,8 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
     private Hmm initializeHMM() {
         
         Hmm<ObservationDiscrete<HMMSequence.Packet>> hmm =
-                new Hmm<ObservationDiscrete<HMMSequence.Packet>>(2, 
-                new OpdfDiscreteFactory<HMMSequence.Packet>(HMMSequence.Packet.class));
+                new Hmm<>(2, 
+                new OpdfDiscreteFactory<>(HMMSequence.Packet.class));
         
         hmm.setPi(0, 0.5);
         hmm.setPi(1, 0.5);
