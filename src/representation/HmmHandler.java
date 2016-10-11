@@ -57,9 +57,9 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
         hmm.setPi(0, 0.5);
         hmm.setPi(1, 0.5);
         
-        hmm.setOpdf(0, new OpdfDiscrete<HMMSequence.Packet>(HMMSequence.Packet.class,
+        hmm.setOpdf(0, new OpdfDiscrete<>(HMMSequence.Packet.class,
                     new double[]{0.2,0.2,0.2,0.2}));
-        hmm.setOpdf(1, new OpdfDiscrete<HMMSequence.Packet>(HMMSequence.Packet.class,
+        hmm.setOpdf(1, new OpdfDiscrete<>(HMMSequence.Packet.class,
                     new double[]{0.2,0.2,0.2,0.2}));
         
         hmm.setAij(0, 0, 0.25);
