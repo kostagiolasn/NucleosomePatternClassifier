@@ -7,30 +7,36 @@ package run;
 
 import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
 import entities.BOWFeatureVector;
+import entities.BaselineBOWFeatureVector;
 import entities.HMMFeatureVector;
 import entities.HMMSequence;
 import entities.NGGFeatureVector;
 import entities.SequenceInstance;
 import entities.WekaBOWFeatureVector;
+import entities.WekaBaselineBOWFeatureVector;
 import entities.WekaHMMFeatureVector;
 import entities.WekaNGGFeatureVector;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import io.FAFileReader;
+import io.ManyInstancesPerFileConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import static java.util.Collections.rotate;
 import java.util.List;
 import representation.BOWHandler;
 import representation.BOW_SequenceAnalyst;
 import representation.BagOfWords;
+import representation.BaselineBOWHandler;
+import representation.BaselineBOW_SequenceAnalyst;
+import representation.BaselineBagOfWords;
 import representation.GenomicSequenceAnalyst;
 import representation.GenomicSequenceRepresentationHandler;
 import representation.HMM_SequenceAnalyst;
 import representation.HmmHandler;
 import representation.NGGHandler;
 import representation.NGG_SequenceAnalyst;
+import representation.NormalizedHmmHandler;
 import statistics.BinaryStatisticsEvaluator;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
@@ -42,6 +48,7 @@ import weka.core.converters.ArffSaver;
 public class RunHandler {
     public void run(String NFR_pathfile, String NBS_pathfile, String folds, String representation_type, String classifier_type) throws IOException {
         FAFileReader reader = new FAFileReader();
+        ManyInstancesPerFileConverter m = new ManyInstancesPerFileConverter();
         ArrayList<SequenceInstance> NFR_instances = reader.getSequencesFromFile(NFR_pathfile);
         ArrayList<SequenceInstance> NBS_instances = reader.getSequencesFromFile(NBS_pathfile);        
         
@@ -50,6 +57,7 @@ public class RunHandler {
         GenomicSequenceAnalyst<List<ObservationDiscrete<HMMSequence.Packet>>> hmm_analyst = new HMM_SequenceAnalyst();
         NGG_SequenceAnalyst ngg_analyst = new NGG_SequenceAnalyst();
         BOW_SequenceAnalyst bow_analyst = new BOW_SequenceAnalyst();
+        BaselineBOW_SequenceAnalyst baselinebow_analyst = new BaselineBOW_SequenceAnalyst();
         
         int nfolds = Integer.parseInt(folds);
         int NFRpartitionSize = NFR_instances.size() / nfolds;
@@ -97,18 +105,23 @@ public class RunHandler {
                 List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTestingHMM = hmm_analyst.represent(NBS_testingSeqs);
                 
                 /* We train the two HMMs only by using the training HMM sequences */
-            
+                long tic = System.nanoTime();
+                
                 GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>> handler = new HmmHandler();
                 handler.train(NFRTrainingHMM, "Nucleosome Free Region");
                 handler.train(NBSTrainingHMM, "Nucleosome Binding Site");
                 
+                long tac = System.nanoTime();
+                long elapsedTime = tac - tic;
+                double seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for HMM training : " + seconds);
                 /* Initializing the vectors we want to store */
             
-                ArrayList<HMMFeatureVector> NFRTrainingVectors = new ArrayList<HMMFeatureVector>();
-                ArrayList<HMMFeatureVector> NBSTrainingVectors = new ArrayList<HMMFeatureVector>();
+                ArrayList<HMMFeatureVector> NFRTrainingVectors = new ArrayList<>();
+                ArrayList<HMMFeatureVector> NBSTrainingVectors = new ArrayList<>();
 
-                ArrayList<HMMFeatureVector> NFRTestingVectors = new ArrayList<HMMFeatureVector>();
-                ArrayList<HMMFeatureVector> NBSTestingVectors = new ArrayList<HMMFeatureVector>();
+                ArrayList<HMMFeatureVector> NFRTestingVectors = new ArrayList<>();
+                ArrayList<HMMFeatureVector> NBSTestingVectors = new ArrayList<>();
                 
                  /* Getting the feature vectors for each of our sequence lists */
             
@@ -130,10 +143,125 @@ public class RunHandler {
                 Instances Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
                 Instances Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
                 
+                // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
+                try {
+                    ArffSaver asSaver = new ArffSaver();
+                    asSaver.setInstances(Training_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
+                    asSaver.writeBatch();
+
+                    asSaver.setInstances(Testing_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
+                    asSaver.writeBatch();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                    System.out.println("Could not output fold ARFF files "
+                            + "(perhaps ARFF directory is missing?). "
+                            + "Skipping...");
+                }
+                
+                tic = System.nanoTime();
+                
                 // Perform classification and get Confusion Matrix
                 BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
                 double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances, classifier_type);
+                
+                tac = System.nanoTime();
+                elapsedTime = tac - tic;
+                seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for HMM classification : " + seconds);
+                // Print results
+                System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
+                System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));
+                System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
+                System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
+                System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
+                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
 
+                rotate(NFR_Seqs, NFRpartitionSize);
+                rotate(NBS_Seqs, NBSpartitionSize);
+
+                NFR_trainingSeqs.clear();
+                NBS_trainingSeqs.clear();
+                NFR_testingSeqs.clear();
+                NBS_testingSeqs.clear();
+            }
+            
+            if("Normalized_HMM".equals(representation_type)) {
+                /* Representing the sequences as HMMs */
+                List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTrainingHMM = hmm_analyst.represent(NFR_trainingSeqs);
+                List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTrainingHMM = hmm_analyst.represent(NBS_trainingSeqs);
+
+                /* The same with the testing sequences */
+                List<List<ObservationDiscrete<HMMSequence.Packet>>> NFRTestingHMM = hmm_analyst.represent(NFR_testingSeqs);
+                List<List<ObservationDiscrete<HMMSequence.Packet>>> NBSTestingHMM = hmm_analyst.represent(NBS_testingSeqs);
+                
+                /* We train the two HMMs only by using the training HMM sequences */
+                long tic = System.nanoTime();
+                
+                GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>> handler = new NormalizedHmmHandler();
+                handler.train(NFRTrainingHMM, "Nucleosome Free Region");
+                handler.train(NBSTrainingHMM, "Nucleosome Binding Site");
+                
+                long tac = System.nanoTime();
+                long elapsedTime = tac - tic;
+                double seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for Normalized HMM training : " + seconds);
+                /* Initializing the vectors we want to store */
+            
+                ArrayList<HMMFeatureVector> NFRTrainingVectors = new ArrayList<>();
+                ArrayList<HMMFeatureVector> NBSTrainingVectors = new ArrayList<>();
+
+                ArrayList<HMMFeatureVector> NFRTestingVectors = new ArrayList<>();
+                ArrayList<HMMFeatureVector> NBSTestingVectors = new ArrayList<>();
+                
+                 /* Getting the feature vectors for each of our sequence lists */
+            
+                for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTrainingHMM) {
+                    NFRTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
+                }  
+                for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTrainingHMM) {
+                    NBSTrainingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
+                }   
+                for(List<ObservationDiscrete<HMMSequence.Packet>> NFRinstanceRepresentation : NFRTestingHMM) {
+                    NFRTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
+                }
+                for(List<ObservationDiscrete<HMMSequence.Packet>> NBSinstanceRepresentation : NBSTestingHMM) {
+                    NBSTestingVectors.add((HMMFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
+                }
+                
+                //Get the Weka feature vectors
+                WekaHMMFeatureVector HMMfv= new WekaHMMFeatureVector();
+                Instances Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
+                Instances Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
+                
+                // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
+                try {
+                    ArffSaver asSaver = new ArffSaver();
+                    asSaver.setInstances(Training_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
+                    asSaver.writeBatch();
+
+                    asSaver.setInstances(Testing_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
+                    asSaver.writeBatch();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                    System.out.println("Could not output fold ARFF files "
+                            + "(perhaps ARFF directory is missing?). "
+                            + "Skipping...");
+                }
+                
+                tic = System.nanoTime();
+                
+                // Perform classification and get Confusion Matrix
+                BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
+                double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances, classifier_type);
+                
+                tac = System.nanoTime();
+                elapsedTime = tac - tic;
+                seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for Normalized HMM classification : " + seconds);
                 // Print results
                 System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
                 System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));
@@ -161,10 +289,16 @@ public class RunHandler {
                 List<List<DocumentNGramGraph>> NBSTestingNGG = ngg_analyst.represent(NBS_testingSeqs);
                 
                 /* We train the two NGGs only by using the training NGG sequences */
-            
+                long tic = System.nanoTime();
+                
                 NGGHandler handler = new NGGHandler();
                 handler.train(NFRTrainingNGG, "Nucleosome Free Region");
                 handler.train(NBSTrainingNGG, "Nucleosome Binding Site");
+                
+                long tac = System.nanoTime();
+                long elapsedTime = tac - tic;
+                double seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for NGG training : " + seconds);
                                 
                 /* Initializing the vectors we want to store */
                 
@@ -190,8 +324,8 @@ public class RunHandler {
                 }
                 
                 WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
-                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors, "training");
-                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors, "testing");
+                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
+                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
                 
                 // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
@@ -210,11 +344,16 @@ public class RunHandler {
                             + "Skipping...");
                 }
                 
+                tic = System.nanoTime();
+                
                 // Perform classification and get Confusion Matrix
                 BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
-                Collections.shuffle(Training_Instances);
-                Collections.shuffle(Testing_Instances);
                 double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances, classifier_type);
+                
+                tac = System.nanoTime();
+                elapsedTime = tac - tic;
+                seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for NGG classification : " + seconds);
 
                 // Print results
                 System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
@@ -244,17 +383,25 @@ public class RunHandler {
                 List<List<BagOfWords>> NBSTestingBOW = bow_analyst.represent(NBS_testingSeqs);
                 
                 /* We train the two BOWs only by using the training BOW sequences */
+                
+                long tic = System.nanoTime();
+                
                 BOWHandler handler = new BOWHandler();
                 handler.train(NFRTrainingBOW, "Nucleosome Free Region");
                 handler.train(NBSTrainingBOW, "Nucleosome Binding Site");
                 
+                long tac = System.nanoTime();
+                long elapsedTime = tac - tic;
+                double seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for BOW training : " + seconds);
+                
                 /* Initializing the vectors we want to store */
                 
-                ArrayList<BOWFeatureVector> NFRTrainingVectors = new ArrayList<BOWFeatureVector>();
-                ArrayList<BOWFeatureVector> NBSTrainingVectors = new ArrayList<BOWFeatureVector>();
+                ArrayList<BOWFeatureVector> NFRTrainingVectors = new ArrayList<>();
+                ArrayList<BOWFeatureVector> NBSTrainingVectors = new ArrayList<>();
 
-                ArrayList<BOWFeatureVector> NFRTestingVectors = new ArrayList<BOWFeatureVector>();
-                ArrayList<BOWFeatureVector> NBSTestingVectors = new ArrayList<BOWFeatureVector>();
+                ArrayList<BOWFeatureVector> NFRTestingVectors = new ArrayList<>();
+                ArrayList<BOWFeatureVector> NBSTestingVectors = new ArrayList<>();
                 
                 for(List<BagOfWords> NFRinstanceRepresentation : NFRTrainingBOW) {
                     NFRTrainingVectors.add((BOWFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
@@ -273,9 +420,126 @@ public class RunHandler {
                 Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
                 Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
                 
+                // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
+                try {
+                    ArffSaver asSaver = new ArffSaver();
+                    asSaver.setInstances(Training_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
+                    asSaver.writeBatch();
+
+                    asSaver.setInstances(Testing_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
+                    asSaver.writeBatch();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                    System.out.println("Could not output fold ARFF files "
+                            + "(perhaps ARFF directory is missing?). "
+                            + "Skipping...");
+                }
+                
+                tic = System.nanoTime();
+                
                 // Perform classification and get Confusion Matrix
                 BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
                 double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances, classifier_type);
+                
+                tac = System.nanoTime();
+                elapsedTime = tac - tic;
+                seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for BOW classification : " + seconds);
+
+                // Print results
+                System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
+                System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));;
+                System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
+                System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
+                System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
+                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+
+
+                rotate(NFR_Seqs, NFRpartitionSize);
+                rotate(NBS_Seqs, NBSpartitionSize);
+
+                NFR_trainingSeqs.clear();
+                NBS_trainingSeqs.clear();
+                NFR_testingSeqs.clear();
+                NBS_testingSeqs.clear();
+            }
+            
+            if("Baseline_BOW".equals(representation_type)) {
+                /* Representing the sequences as BOWs */
+                List<List<BaselineBagOfWords>> NFRTrainingBOW = baselinebow_analyst.represent(NFR_trainingSeqs);
+                List<List<BaselineBagOfWords>> NBSTrainingBOW = baselinebow_analyst.represent(NBS_trainingSeqs);
+
+                /* The same with the testing sequences */
+                List<List<BaselineBagOfWords>> NFRTestingBOW = baselinebow_analyst.represent(NFR_testingSeqs);
+                List<List<BaselineBagOfWords>> NBSTestingBOW = baselinebow_analyst.represent(NBS_testingSeqs);
+                
+                /* We train the two BOWs only by using the training BOW sequences */
+                
+                long tic = System.nanoTime();
+                
+                BaselineBOWHandler handler = new BaselineBOWHandler();
+                handler.train(NFRTrainingBOW, "Nucleosome Free Region");
+                handler.train(NBSTrainingBOW, "Nucleosome Binding Site");
+                
+                long tac = System.nanoTime();
+                long elapsedTime = tac - tic;
+                double seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for BOW training : " + seconds);
+                
+                /* Initializing the vectors we want to store */
+                
+                ArrayList<BaselineBOWFeatureVector> NFRTrainingVectors = new ArrayList<>();
+                ArrayList<BaselineBOWFeatureVector> NBSTrainingVectors = new ArrayList<>();
+
+                ArrayList<BaselineBOWFeatureVector> NFRTestingVectors = new ArrayList<>();
+                ArrayList<BaselineBOWFeatureVector> NBSTestingVectors = new ArrayList<>();
+                
+                for(List<BaselineBagOfWords> NFRinstanceRepresentation : NFRTrainingBOW) {
+                    NFRTrainingVectors.add((BaselineBOWFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
+                }  
+                for(List<BaselineBagOfWords> NBSinstanceRepresentation : NBSTrainingBOW) {
+                    NBSTrainingVectors.add((BaselineBOWFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
+                }   
+                for(List<BaselineBagOfWords> NFRinstanceRepresentation : NFRTestingBOW) {
+                    NFRTestingVectors.add((BaselineBOWFeatureVector) handler.getFeatureVector(NFRinstanceRepresentation, "Nucleosome Free Region"));
+                }
+                for(List<BaselineBagOfWords> NBSinstanceRepresentation : NBSTestingBOW) {
+                    NBSTestingVectors.add((BaselineBOWFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
+                }
+                
+                WekaBaselineBOWFeatureVector BBOWfv= new WekaBaselineBOWFeatureVector();
+                Instances Training_Instances = BBOWfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
+                Instances Testing_Instances = BBOWfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
+                
+                // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
+                try {
+                    ArffSaver asSaver = new ArffSaver();
+                    asSaver.setInstances(Training_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
+                    asSaver.writeBatch();
+
+                    asSaver.setInstances(Testing_Instances);
+                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
+                    asSaver.writeBatch();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                    System.out.println("Could not output fold ARFF files "
+                            + "(perhaps ARFF directory is missing?). "
+                            + "Skipping...");
+                }
+                
+                tic = System.nanoTime();
+                
+                // Perform classification and get Confusion Matrix
+                BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
+                double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances, classifier_type);
+                
+                tac = System.nanoTime();
+                elapsedTime = tac - tic;
+                seconds = (double)elapsedTime / 1000000000.0;
+                System.out.println("time elapsed for BOW classification : " + seconds);
 
                 // Print results
                 System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
