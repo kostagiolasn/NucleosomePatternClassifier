@@ -35,6 +35,8 @@ public class NucleosomePatternClassifier {
         <BOW> : Bag of Words
         <NGG> : N-gram graphs
         <HMM> : Hidden Markov Models
+        <Normalized_HMM> : Normalized HMM
+        <Baseline_BOW> : Baseline Bag of Words
         
         >> classifier types
         <NB> : Naive Bayes
