@@ -46,8 +46,8 @@ public class WekaHMMFeatureVector implements WekaFeatureVector {
         double[] values = new double[data.numAttributes()];
         double min_prob;
         
-        values[0] = vSource.getProbArrayAtIndex(0)/((vSource.getProbArrayAtIndex(0) + vSource.getProbArrayAtIndex(1)) / 2);
-        values[1] = vSource.getProbArrayAtIndex(1)/((vSource.getProbArrayAtIndex(0) + vSource.getProbArrayAtIndex(1)) / 2);
+        values[0] = vSource.getProbArrayAtIndex(0)/(vSource.getProbArrayAtIndex(0) + vSource.getProbArrayAtIndex(1));
+        values[1] = vSource.getProbArrayAtIndex(1)/(vSource.getProbArrayAtIndex(0) + vSource.getProbArrayAtIndex(1));
         values[2] = data.attribute(2).indexOfValue(vSource.getLabel());
         
         Instance inst = new DenseInstance(1.0, values);
