@@ -16,6 +16,7 @@ import java.util.List;
 import entities.HMMSequence;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
 /**
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 public class HmmHandler implements GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>>{
     
-    private final Map<String, Hmm> classModel;
+    protected final Map<String, Hmm> classModel;
 
     public HmmHandler() {
         this.classModel = new HashMap<>();
@@ -54,18 +55,26 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
                 new Hmm<>(2, 
                 new OpdfDiscreteFactory<>(HMMSequence.Packet.class));
         
-        hmm.setPi(0, 0.5);
-        hmm.setPi(1, 0.5);
+        // Random initialization (with fixed seed to allow for reproducibility)
+        Random r = new Random(1L);
+        double dRnd = r.nextDouble(); 
+        hmm.setPi(0, dRnd);
+        hmm.setPi(1, 1.0 - dRnd);
+//        hmm.setPi(0, 0.5);
+//        hmm.setPi(1, 0.5);
         
+        // Non-equal probs
         hmm.setOpdf(0, new OpdfDiscrete<>(HMMSequence.Packet.class,
-                    new double[]{0.2,0.2,0.2,0.2}));
+                    new double[]{0.1,0.2,0.3,0.4}));
         hmm.setOpdf(1, new OpdfDiscrete<>(HMMSequence.Packet.class,
-                    new double[]{0.2,0.2,0.2,0.2}));
+                    new double[]{0.4,0.3,0.2,0.1}));
         
-        hmm.setAij(0, 0, 0.25);
-        hmm.setAij(0, 1, 0.25);
-        hmm.setAij(1, 0, 0.25);
-        hmm.setAij(1, 1, 0.25);
+        dRnd = r.nextDouble();
+        hmm.setAij(0, 0, dRnd);
+        hmm.setAij(0, 1, 1.0 - dRnd);
+        dRnd = r.nextDouble();
+        hmm.setAij(1, 0, dRnd);
+        hmm.setAij(1, 1, 1.0 - dRnd);
         
         return hmm;
     }

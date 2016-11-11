@@ -23,53 +23,34 @@ import java.util.Map;
  *
  * @author nikos
  */
-public class NormalizedHmmHandler implements GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>>{
+public class NormalizedHmmHandler extends HmmHandler implements GenomicSequenceRepresentationHandler<List<ObservationDiscrete<HMMSequence.Packet>>>
+{
     
-    private final Map<String, Hmm> classModel;
-
     public NormalizedHmmHandler() {
-        this.classModel = new HashMap<>();
+        super();
     }
 
-    @Override
-    public void train(List<List<ObservationDiscrete<Packet>>> representation, String label) {
-        
-        Hmm hmmTemp = initializeHMM();
-        
-        // Train the model based on the observations
-        BaumWelchLearner bwl = new BaumWelchLearner();
-        
-        hmmTemp = bwl.learn(hmmTemp, representation);
-        
-        classModel.put(label, hmmTemp);
-    }
-
-    @Override
-    public Map<String, Hmm> getClassModel() {
-        return classModel;
-    }
-
-    private Hmm initializeHMM() {
-        
-        Hmm<ObservationDiscrete<HMMSequence.Packet>> hmm =
-                new Hmm<>(2, 
-                new OpdfDiscreteFactory<>(HMMSequence.Packet.class));
-        
-        hmm.setPi(0, 0.5);
-        hmm.setPi(1, 0.5);
-        
-        hmm.setOpdf(0, new OpdfDiscrete<>(HMMSequence.Packet.class,
-                    new double[]{0.2,0.2,0.2,0.2}));
-        hmm.setOpdf(1, new OpdfDiscrete<>(HMMSequence.Packet.class,
-                    new double[]{0.2,0.2,0.2,0.2}));
-        
-        hmm.setAij(0, 0, 0.25);
-        hmm.setAij(0, 1, 0.25);
-        hmm.setAij(1, 0, 0.25);
-        hmm.setAij(1, 1, 0.25);
-        
-        return hmm;
-    }
+//    private Hmm initializeHMM() {
+//        
+//        Hmm<ObservationDiscrete<HMMSequence.Packet>> hmm =
+//                new Hmm<>(2, 
+//                new OpdfDiscreteFactory<>(HMMSequence.Packet.class));
+//        
+//        hmm.setPi(0, 0.5);
+//        hmm.setPi(1, 0.5);
+//        
+//        hmm.setOpdf(0, new OpdfDiscrete<>(HMMSequence.Packet.class,
+//                    new double[]{0.2,0.2,0.2,0.2}));
+//        hmm.setOpdf(1, new OpdfDiscrete<>(HMMSequence.Packet.class,
+//                    new double[]{0.2,0.2,0.2,0.2}));
+//        
+//        hmm.setAij(0, 0, 0.25);
+//        hmm.setAij(0, 1, 0.25);
+//        hmm.setAij(1, 0, 0.25);
+//        hmm.setAij(1, 1, 0.25);
+//        
+//        return hmm;
+//    }
 
     @Override
     public HMMFeatureVector getFeatureVector(List<ObservationDiscrete<Packet>> representation, String label) {
@@ -81,15 +62,15 @@ public class NormalizedHmmHandler implements GenomicSequenceRepresentationHandle
         for(String className : classModel.keySet()) {
             Hmm tempModel = classModel.get(className);
 
-            double dProb = tempModel.probability(representation);
+            double dProb = tempModel.lnProbability(representation);
 
             if(dProb > dMaxProb) {
                 dMaxProb = dProb;
             }
-            // Here we normalize the probability by multiplying it by the respectable
+            // Here we normalize the probability by dividing it by the respective
             // string size. This is due to the fact that the probability decreases
             // as the string gets longer and longer.
-            v.setProbArrayAtIndex(log(dProb)/representation.size(), count);
+            v.setProbArrayAtIndex(dProb/representation.size(), count);
             count++;
         }
         v.setLabel(label);

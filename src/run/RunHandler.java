@@ -48,7 +48,7 @@ import weka.core.converters.ArffSaver;
 public class RunHandler {
     public void run(String NFR_pathfile, String NBS_pathfile, String folds, String representation_type, String classifier_type) throws IOException {
         FAFileReader reader = new FAFileReader();
-        ManyInstancesPerFileConverter m = new ManyInstancesPerFileConverter();
+//        ManyInstancesPerFileConverter m = new ManyInstancesPerFileConverter();
         ArrayList<SequenceInstance> NFR_instances = reader.getSequencesFromFile(NFR_pathfile);
         ArrayList<SequenceInstance> NBS_instances = reader.getSequencesFromFile(NBS_pathfile);        
         
@@ -77,23 +77,11 @@ public class RunHandler {
         NBS_testingSeqs = new ArrayList();
 
         for (int i = 0; i < nfolds; i++) {
-            /* Initializing the training sequences */
-            for(int j = 0; j < (nfolds-1)*NFRpartitionSize; j++) {
-                NFR_trainingSeqs.add(NFR_Seqs.get(j));
-            }
+            initTrainingSeqs(nfolds, NFRpartitionSize, NFR_trainingSeqs, NFR_Seqs, 
+                    NBSpartitionSize, NBS_trainingSeqs, NBS_Seqs);
             
-            for(int j = 0; j < (nfolds-1)*NBSpartitionSize; j++) {
-                NBS_trainingSeqs.add(NBS_Seqs.get(j));
-            }
-            
-            /* Initializing the testing sequences */
-            for(int j = (nfolds-1)*NFRpartitionSize; j < NFR_Seqs.size(); j++) {
-                NFR_testingSeqs.add(NFR_Seqs.get(j));
-            }
-            
-            for(int j = (nfolds-1)*NBSpartitionSize; j < NBS_Seqs.size(); j++) {
-                NBS_testingSeqs.add(NBS_Seqs.get(j));
-            }
+            initTestSeqs(nfolds, NFRpartitionSize, NFR_Seqs, NFR_testingSeqs, 
+                    NBSpartitionSize, NBS_Seqs, NBS_testingSeqs);
             
             if("HMM".equals(representation_type)) {
                 /* Representing the sequences as HMMs */
@@ -143,16 +131,8 @@ public class RunHandler {
                 Instances Training_Instances = HMMfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
                 Instances Testing_Instances = HMMfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
                 
-                // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
-                    ArffSaver asSaver = new ArffSaver();
-                    asSaver.setInstances(Training_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
-                    asSaver.writeBatch();
-
-                    asSaver.setInstances(Testing_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
-                    asSaver.writeBatch();
+                    saveFoldFiles(Training_Instances, i, Testing_Instances);
                 } catch (IOException ioe) {
                     ioe.printStackTrace(System.err);
                     System.out.println("Could not output fold ARFF files "
@@ -181,10 +161,7 @@ public class RunHandler {
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);
 
-                NFR_trainingSeqs.clear();
-                NBS_trainingSeqs.clear();
-                NFR_testingSeqs.clear();
-                NBS_testingSeqs.clear();
+                clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
             }
             
             if("Normalized_HMM".equals(representation_type)) {
@@ -237,14 +214,7 @@ public class RunHandler {
                 
                 // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
-                    ArffSaver asSaver = new ArffSaver();
-                    asSaver.setInstances(Training_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
-                    asSaver.writeBatch();
-
-                    asSaver.setInstances(Testing_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
-                    asSaver.writeBatch();
+                    saveFoldFiles(Training_Instances, i, Testing_Instances);
                 } catch (IOException ioe) {
                     ioe.printStackTrace(System.err);
                     System.out.println("Could not output fold ARFF files "
@@ -273,10 +243,7 @@ public class RunHandler {
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);
 
-                NFR_trainingSeqs.clear();
-                NBS_trainingSeqs.clear();
-                NFR_testingSeqs.clear();
-                NBS_testingSeqs.clear();
+                clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
             }
             
             if("NGG".equals(representation_type)) {
@@ -324,19 +291,12 @@ public class RunHandler {
                 }
                 
                 WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
-                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
-                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
+                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors, "train");
+                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors, "test");
                 
                 // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
-                    ArffSaver asSaver = new ArffSaver();
-                    asSaver.setInstances(Training_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
-                    asSaver.writeBatch();
-
-                    asSaver.setInstances(Testing_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
-                    asSaver.writeBatch();
+                    saveFoldFiles(Training_Instances, i, Testing_Instances);
                 } catch (IOException ioe) {
                     ioe.printStackTrace(System.err);
                     System.out.println("Could not output fold ARFF files "
@@ -355,21 +315,12 @@ public class RunHandler {
                 seconds = (double)elapsedTime / 1000000000.0;
                 System.out.println("time elapsed for NGG classification : " + seconds);
 
-                // Print results
-                System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
-                System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));;
-                System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
-                System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
-                System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
-                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+                outputResults(i, ev, ConfMatrix);
 
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);
 
-                NFR_trainingSeqs.clear();
-                NBS_trainingSeqs.clear();
-                NFR_testingSeqs.clear();
-                NBS_testingSeqs.clear();
+                clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
 
             }
             
@@ -422,14 +373,7 @@ public class RunHandler {
                 
                 // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
-                    ArffSaver asSaver = new ArffSaver();
-                    asSaver.setInstances(Training_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
-                    asSaver.writeBatch();
-
-                    asSaver.setInstances(Testing_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
-                    asSaver.writeBatch();
+                    saveFoldFiles(Training_Instances, i, Testing_Instances);
                 } catch (IOException ioe) {
                     ioe.printStackTrace(System.err);
                     System.out.println("Could not output fold ARFF files "
@@ -448,22 +392,13 @@ public class RunHandler {
                 seconds = (double)elapsedTime / 1000000000.0;
                 System.out.println("time elapsed for BOW classification : " + seconds);
 
-                // Print results
-                System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
-                System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));;
-                System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
-                System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
-                System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
-                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+                outputResults(i, ev, ConfMatrix);
 
 
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);
 
-                NFR_trainingSeqs.clear();
-                NBS_trainingSeqs.clear();
-                NFR_testingSeqs.clear();
-                NBS_testingSeqs.clear();
+                clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
             }
             
             if("Baseline_BOW".equals(representation_type)) {
@@ -515,14 +450,7 @@ public class RunHandler {
                 
                 // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
-                    ArffSaver asSaver = new ArffSaver();
-                    asSaver.setInstances(Training_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
-                    asSaver.writeBatch();
-
-                    asSaver.setInstances(Testing_Instances);
-                    asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
-                    asSaver.writeBatch();
+                    saveFoldFiles(Training_Instances, i, Testing_Instances);
                 } catch (IOException ioe) {
                     ioe.printStackTrace(System.err);
                     System.out.println("Could not output fold ARFF files "
@@ -541,23 +469,66 @@ public class RunHandler {
                 seconds = (double)elapsedTime / 1000000000.0;
                 System.out.println("time elapsed for BOW classification : " + seconds);
 
-                // Print results
-                System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
-                System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));;
-                System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
-                System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
-                System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
-                System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+                outputResults(i, ev, ConfMatrix);
 
 
                 rotate(NFR_Seqs, NFRpartitionSize);
                 rotate(NBS_Seqs, NBSpartitionSize);
 
-                NFR_trainingSeqs.clear();
-                NBS_trainingSeqs.clear();
-                NFR_testingSeqs.clear();
-                NBS_testingSeqs.clear();
+                clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
             }
+        }
+    }
+
+    protected void clearSeqs(List<SequenceInstance> NFR_trainingSeqs, List<SequenceInstance> NBS_trainingSeqs, List<SequenceInstance> NFR_testingSeqs, List<SequenceInstance> NBS_testingSeqs) {
+        NFR_trainingSeqs.clear();
+        NBS_trainingSeqs.clear();
+        NFR_testingSeqs.clear();
+        NBS_testingSeqs.clear();
+    }
+
+    protected void outputResults(int iFoldNo, BinaryStatisticsEvaluator ev, double[][] ConfMatrix) {
+        // Print results
+        System.out.println("\n=== Fold:" + iFoldNo + "===");
+        System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
+        System.out.println("Accuracy of model :" + ev.getAccuracy(ConfMatrix));;
+        System.out.println("AUC of model :" + ev.getAUC(ConfMatrix));
+        System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
+        System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
+        System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+    }
+
+    protected void saveFoldFiles(Instances Training_Instances, int i, Instances Testing_Instances) throws IOException {
+        // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
+        ArffSaver asSaver = new ArffSaver();
+        asSaver.setInstances(Training_Instances);
+        asSaver.setFile(new File(String.format("ARFF/train-fold%d.arff", i)));
+        asSaver.writeBatch();
+        
+        asSaver.setInstances(Testing_Instances);
+        asSaver.setFile(new File(String.format("ARFF/test-fold%d.arff", i)));
+        asSaver.writeBatch();
+    }
+
+    protected void initTestSeqs(int nfolds, int NFRpartitionSize, List<SequenceInstance> NFR_Seqs, List<SequenceInstance> NFR_testingSeqs, int NBSpartitionSize, List<SequenceInstance> NBS_Seqs, List<SequenceInstance> NBS_testingSeqs) {
+        /* Initializing the testing sequences */
+        for(int j = (nfolds-1)*NFRpartitionSize; j < NFR_Seqs.size(); j++) {
+            NFR_testingSeqs.add(NFR_Seqs.get(j));
+        }
+        
+        for(int j = (nfolds-1)*NBSpartitionSize; j < NBS_Seqs.size(); j++) {
+            NBS_testingSeqs.add(NBS_Seqs.get(j));
+        }
+    }
+
+    protected void initTrainingSeqs(int nfolds, int NFRpartitionSize, List<SequenceInstance> NFR_trainingSeqs, List<SequenceInstance> NFR_Seqs, int NBSpartitionSize, List<SequenceInstance> NBS_trainingSeqs, List<SequenceInstance> NBS_Seqs) {
+        /* Initializing the training sequences */
+        for(int j = 0; j < (nfolds-1)*NFRpartitionSize; j++) {
+            NFR_trainingSeqs.add(NFR_Seqs.get(j));
+        }
+        
+        for(int j = 0; j < (nfolds-1)*NBSpartitionSize; j++) {
+            NBS_trainingSeqs.add(NBS_Seqs.get(j));
         }
     }
 }
