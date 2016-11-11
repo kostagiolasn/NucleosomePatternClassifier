@@ -49,7 +49,7 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
         return classModel;
     }
 
-    private Hmm initializeHMM() {
+    protected Hmm initializeHMM() {
         
         Hmm<ObservationDiscrete<HMMSequence.Packet>> hmm =
                 new Hmm<>(2, 

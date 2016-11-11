@@ -7,16 +7,10 @@ package representation;
 
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
-import be.ac.ulg.montefiore.run.jahmm.OpdfDiscrete;
-import be.ac.ulg.montefiore.run.jahmm.OpdfDiscreteFactory;
-import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import entities.HMMFeatureVector;
 import entities.HMMSequence.Packet;
 import java.util.List;
 import entities.HMMSequence;
-import static java.lang.Math.log;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

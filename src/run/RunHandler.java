@@ -18,7 +18,6 @@ import entities.WekaHMMFeatureVector;
 import entities.WekaNGGFeatureVector;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import io.FAFileReader;
-import io.ManyInstancesPerFileConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
