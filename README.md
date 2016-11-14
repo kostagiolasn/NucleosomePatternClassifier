@@ -24,7 +24,7 @@ predicting nucleosome positioning based on the textual data of the underlying ge
 
 ## Experiments
 The dataset we will use for our study consists of the the S. cerevisiae genome and is the
-similar dataset to that used in .Due to it being a commonly used dataset in previous
+similar dataset to that used in [1].Due to it being a commonly used dataset in previous
 studies, we can easily compare our results with that of previous experiments.
 
 Here, follows a description of the data files :
@@ -41,6 +41,22 @@ ATGAGA..."
 
 In our approach we use exclusively the .fa files (FASTA). The NBS and NFR data files in both formats can be found in the Datasets
 folder of this repository.
+
+## Tools Used
+For handling the Hidden Markov Model part of the implementation, Jahmm[2], a Java library implementing the various algorithms 
+related to HMMs was used. For training our HMM model, we used the Baum-Welch algorithm [3], which was implemented
+in this library.
+Jahmm’s original author is JeanMarc Francois.
+
+In addition, for the n-gram graph part of the implementation, the JINSECT[4] toolkit was used. JINSECT is a Java-based
+toolkit and library that supports and demonstrates the use of n-gram graphs within Natural Language Processing applications.
+For our implementation, we took advantage of JINSECT’s tools capable of creating, merging and comparing ngram
+graphs, which facilitated the feature extraction needed for the experiments.
+JINSECT was written by George Giannakopoulos and Panagiotis Giotis.
+
+Finally, we used Weka[5][6] a collection of machine learning algorithms for data mining tasks, in order to utilize these 
+algorithms for our classification tasks.
+The Weka Data Mining Software was implemented by the Machine Learning Group at the University of Waikato.
 
 ## License
 The code is released under Apache v2.0 license.
