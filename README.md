@@ -39,5 +39,8 @@ elements, due to having not only the information about the three elements descri
 information about the nucleotide sequences. Hence, the above example now looks like this: "chr5:100200
 ATGAGA..."
 
+In our approach we use exclusively the .fa files (FASTA). The NBS and NFR data files in both formats can be found in the Datasets
+folder of this repository.
+
 ## License
 The code is released under Apache v2.0 license.
