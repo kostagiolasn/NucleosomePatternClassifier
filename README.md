@@ -22,5 +22,24 @@ genomic sequences as *NFR* and *NBS*. Finally, we conclude that, based on our fi
 be more suitable for defining the structural elements of chromatin, as they prove to be more effective at 
 predicting nucleosome positioning based on the textual data of the underlying genomic sequence.
 
+## Experiments
+The dataset we will use for our study consists of the the S. cerevisiae genome and is the
+similar dataset to that used in .Due to it being a commonly used dataset in previous
+studies, we can easily compare our results with that of previous experiments.
+
+Here, follows a description of the data files :
+* .bed files
+These .bed files (browser extensible data) have a quite simple structure, which consists from three elements : 
+a) the chromosome to which the specific data belongs, 
+b) the starting point, and 
+c) the ending point of it.
+For example the line "chr5 100 200" means that the element we’ve encountered belongs to the 5th
+chromosome from the 100th position to the 200th.
+* .fa files
+These .fa files complement the above .bed files by providing more information for the specific coordinated 
+elements, due to having not only the information about the three elements described above, but also having 
+information about the nucleotide sequences. Hence, the above example now looks like this: "chr5:100200
+ATGAGA..."
+
 ## License
 The code is released under Apache v2.0 license.
