@@ -58,5 +58,17 @@ Finally, we used **Weka**[5][6] a collection of machine learning algorithms for 
 algorithms for our classification tasks.
 The **Weka Data Mining Software** was implemented by the *Machine Learning Group* at the *University of Waikato*.
 
+## References
+[1] *Christoforos Nikolaou, Sonja Althammer, Miguel Beato, and Roderic Guig´o. Structural
+constraints revealed in consistent nucleosome positions in the genome of s. cerevisiae.
+3(1):20.*
+[2] *[https://github.com/aubry74/Jahmm](https://github.com/aubry74/Jahmm)*
+[3] *Leonard E. Baum and Ted Petrie. Statistical inference for probabilistic functions of finite
+state markov chains. Ann. Math. Statist., 37(6):1554–1563, 12 1966.*\
+[4] *[https://sourceforge.net/p/jinsect/wiki/Home/](https://sourceforge.net/p/jinsect/wiki/Home/)*
+[5] *[http://www.cs.waikato.ac.nz/ml/weka/](http://www.cs.waikato.ac.nz/ml/weka/)* 
+[6] *Mark Hall, Eibe Frank, Geoffrey Holmes, Bernhard Pfahringer, Peter Reutemann, and
+Ian H. Witten. The weka data mining software: An update. SIGKDD Explor. Newsl.,
+11(1):10–18, November 2009.*
 ## License
 The code is released under Apache v2.0 license.
