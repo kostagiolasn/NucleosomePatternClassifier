@@ -28,8 +28,7 @@ similar dataset to that used in .Due to it being a commonly used dataset in prev
 studies, we can easily compare our results with that of previous experiments.
 
 Here, follows a description of the data files :
-* .bed files
-These .bed files (browser extensible data) have a quite simple structure, which consists from three elements : 
+* .bed files : These .bed files (browser extensible data) have a quite simple structure, which consists from three elements : 
 a) the chromosome to which the specific data belongs, 
 b) the starting point, and 
 c) the ending point of it.
