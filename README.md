@@ -43,20 +43,20 @@ In our approach we use exclusively the .fa files (FASTA). The NBS and NFR data f
 folder of this repository.
 
 ## Tools Used
-For handling the Hidden Markov Model part of the implementation, Jahmm[2], a Java library implementing the various algorithms 
-related to HMMs was used. For training our HMM model, we used the Baum-Welch algorithm [3], which was implemented
+For handling the **Hidden Markov Model** part of the implementation, **Jahmm**[2], a Java library implementing the various algorithms 
+related to HMMs was used. For training our HMM model, we used the *Baum-Welch* algorithm[3], which was implemented
 in this library.
-Jahmm’s original author is JeanMarc Francois.
+**Jahmm**’s original author is *JeanMarc Francois*.
 
-In addition, for the n-gram graph part of the implementation, the JINSECT[4] toolkit was used. JINSECT is a Java-based
+In addition, for the **N-gram Graph** part of the implementation, the **JInsect**[4] toolkit was used. **JInsect** is a Java-based
 toolkit and library that supports and demonstrates the use of n-gram graphs within Natural Language Processing applications.
-For our implementation, we took advantage of JINSECT’s tools capable of creating, merging and comparing ngram
-graphs, which facilitated the feature extraction needed for the experiments.
-JINSECT was written by George Giannakopoulos and Panagiotis Giotis.
+For our implementation, we took advantage of **JInsect**’s tools capable of creating, merging and comparing N-gram graphs, which 
+facilitated the feature extraction needed for the experiments.
+**JInsect** was written by *George Giannakopoulos* and *Panagiotis Giotis*.
 
-Finally, we used Weka[5][6] a collection of machine learning algorithms for data mining tasks, in order to utilize these 
+Finally, we used **Weka**[5][6] a collection of machine learning algorithms for data mining tasks, in order to utilize these 
 algorithms for our classification tasks.
-The Weka Data Mining Software was implemented by the Machine Learning Group at the University of Waikato.
+The **Weka Data Mining Software** was implemented by the *Machine Learning Group* at the *University of Waikato*.
 
 ## License
 The code is released under Apache v2.0 license.
