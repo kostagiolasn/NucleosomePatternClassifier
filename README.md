@@ -17,7 +17,7 @@ structure. To the best of our knowledge, there exists no complete study on the e
 the classification of genomic sequenses as **nucleosome free regions** (*NFR*) or **nucleosome binding sites** (*NBS*). 
 
 In this approach we study 3 different genomic sequence representations (**Hidden Markov Models, Bag-of-Words**
-and **N-gram Graphs**) in combination to a number of machine learning algorithms on the task of classifying 
+and  **N-gram Graphs**) in combination to a number of machine learning algorithms on the task of classifying 
 genomic sequences as *NFR* and *NBS*. Finally, we conclude that, based on our findings, novel approaches may
 be more suitable for defining the structural elements of chromatin, as they prove to be more effective at 
 predicting nucleosome positioning based on the textual data of the underlying genomic sequence.
