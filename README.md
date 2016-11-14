@@ -60,7 +60,7 @@ The **Weka Data Mining Software** was implemented by the *Machine Learning Group
 
 ## Usage
 You can download the project for your own use. The argument list is as follows:
--NFR <path to the FASTA file containing the genomic text data of the NFR sequences> -NBS <path to the FASTA file containing the genomic text data of the NBS sequences> -folds <number of folds for cross-validation purposes> -rep <a string containing one of the following values {HMM, NGG, BOW, Baseline_BOW, Normalized_HMM} which specifies the representation to be used> -clf <a string containing one of the following values {NB, DT, ΚNN, SVM} for the classification algorithm to be used>. 
+-NFR `<path to the FASTA file containing the genomic text data of the NFR sequences>` -NBS `<path to the FASTA file containing the genomic text data of the NBS sequences>` -folds `<number of folds for cross-validation purposes>` -rep `<a string containing one of the following values {HMM, NGG, BOW, Baseline_BOW, Normalized_HMM} which specifies the representation to be used>` -clf `<a string containing one of the following values {NB, DT, ΚNN, SVM} for the classification algorithm to be used>`. 
 
 **Disambiguation**
 * Representations
