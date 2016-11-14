@@ -58,6 +58,21 @@ Finally, we used **Weka**[5][6] a collection of machine learning algorithms for 
 algorithms for our classification tasks.
 The **Weka Data Mining Software** was implemented by the *Machine Learning Group* at the *University of Waikato*.
 
+## Usage
+You can download the project for your own use. The argument list is as follows:
+-NFR <path to the FASTA file containing the genomic text data of the NFR sequences> -NBS <path to the FASTA file containing the genomic text data of the NBS sequences> -folds <number of folds for cross-validation purposes> -rep <a string containing one of the following values {HMM, NGG, BOW, Baseline_BOW, Normalized_HMM} which specifies the representation to be used> -clf <a string containing one of the following values {NB, DT, ΚNN, SVM} for the classification algorithm to be used>. 
+
+**Disambiguation**
+* Representations
+  * HMM : Hidden Markov Model
+  * BOW : Bag-of-Words
+  * NGG: N-gram Graphs
+* Classification Agorithms
+  * NB : Naive Bayes
+  * DT : Decision Trees
+  * KNN : k-nearest Neighbors
+  * SVM : Support Vector Machines
+
 ## References
 - [1] *Christoforos Nikolaou, Sonja Althammer, Miguel Beato, and Roderic Guig´o. Structural constraints revealed in consistent nucleosome positions in the genome of s. cerevisiae. 3(1):20.*
 - [2] *https://github.com/aubry74/Jahmm*
@@ -65,5 +80,6 @@ The **Weka Data Mining Software** was implemented by the *Machine Learning Group
 - [4] *https://sourceforge.net/p/jinsect/wiki/Home/*
 - [5] *http://www.cs.waikato.ac.nz/ml/weka/* 
 - [6] *Mark Hall, Eibe Frank, Geoffrey Holmes, Bernhard Pfahringer, Peter Reutemann, and Ian H. Witten. The weka data mining software: An update. SIGKDD Explor. Newsl., 11(1):10–18, November 2009.*
+
 ## License
 The code is released under Apache v2.0 license.
