@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class BaselineBOWFeatureVector {
     String label;
-    ArrayList<Integer> frequencyArray;
+    ArrayList<Double> frequencyArray;
     ArrayList<String> Bag;
 
     public BaselineBOWFeatureVector() {
@@ -29,11 +29,11 @@ public class BaselineBOWFeatureVector {
         return label;
     }
 
-    public int getFrequencyArrayAtIndex(int index) {
+    public double getFrequencyArrayAtIndex(int index) {
         return frequencyArray.get(index);
     }
 
-    public void setFrequencyArrayAtIndex(int element) {
+    public void setFrequencyArrayAtIndex(double element) {
         this.frequencyArray.add(element);
     }
     
@@ -50,3 +50,4 @@ public class BaselineBOWFeatureVector {
             Bag.add(string);
     }
 }
+
