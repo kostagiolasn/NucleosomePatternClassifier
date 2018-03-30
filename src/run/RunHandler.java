@@ -366,9 +366,9 @@ public class RunHandler {
                     NBSTestingVectors.add((BOWFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
                 }
                 
-                 WekaBOWFeatureVector NGGfv= new WekaBOWFeatureVector();
-                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
-                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
+                 WekaBOWFeatureVector BOWfv = new WekaBOWFeatureVector();
+                Instances Training_Instances = BOWfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
+                Instances Testing_Instances = BOWfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
                 
                 // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
