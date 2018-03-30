@@ -9,14 +9,18 @@ import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationDiscrete;
 import be.ac.ulg.montefiore.run.jahmm.OpdfDiscrete;
 import be.ac.ulg.montefiore.run.jahmm.OpdfDiscreteFactory;
+import be.ac.ulg.montefiore.run.jahmm.draw.GenericHmmDrawerDot;
 import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import entities.HMMFeatureVector;
 import entities.HMMSequence.Packet;
 import java.util.List;
 import entities.HMMSequence;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -40,6 +44,12 @@ public class HmmHandler implements GenomicSequenceRepresentationHandler<List<Obs
         BaumWelchLearner bwl = new BaumWelchLearner();
         
         hmmTemp = bwl.learn(hmmTemp, representation);
+        
+        try {
+            (new GenericHmmDrawerDot()).write(hmmTemp, "learntHmm.dot");
+        } catch (IOException ex) {
+            Logger.getLogger(HmmHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         classModel.put(label, hmmTemp);
     }
