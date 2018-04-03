@@ -20,17 +20,25 @@ import weka.core.converters.ArffSaver;
  */
 public class WekaBaselineBOWFeatureVector implements WekaFeatureVector{
 
+    private int length;
+    public WekaBaselineBOWFeatureVector(int length) {
+        this.length = length;
+    }
+
     @Override
     public ArrayList<Attribute> initializeWekaFeatureVector() {
         
         //Declaration of the numeric value cosSimilarity
-        String s = "triNucleotide";
-        
+        String s = null;
+        if (length == 3) s = "triNucleotide";
+        if (length == 2) s = "biNucleotide";
+        int combos = (int)Math.pow(4, length);
+
         //Declare the feature vector
         ArrayList<Attribute> fvWekaAttributesBow;
         fvWekaAttributesBow = new ArrayList<>();
         
-        for(int i = 0; i < 64; i++) {
+        for(int i = 0; i < combos; i++) {
             Attribute tempAttribute = new Attribute(s + " " + Integer.toString(i));
             fvWekaAttributesBow.add(tempAttribute);
         }
@@ -51,12 +59,13 @@ public class WekaBaselineBOWFeatureVector implements WekaFeatureVector{
     
      public Instance fillFeatureVector(BaselineBOWFeatureVector vSource, Instances data) {
          double[] values = new double[data.numAttributes()];
-        
+         int combos = (int)Math.pow(4, length);
+
         //values[0] = vSource.getCosSimilarityArrayAtIndex(0);//((vSource.getCosSimilarityArrayAtIndex(0) + vSource.getCosSimilarityArrayAtIndex(1)));
         //values[1] = vSource.getCosSimilarityArrayAtIndex(1);//((vSource.getCosSimilarityArrayAtIndex(0) + vSource.getCosSimilarityArrayAtIndex(1)));
-        for(int i = 0; i < 64; i++)
+        for(int i = 0; i < combos; i++)
             values[i] = vSource.getFrequencyArrayAtIndex(i);
-        values[64] = data.attribute(64).indexOfValue(vSource.getLabel());
+        values[combos] = data.attribute(combos).indexOfValue(vSource.getLabel());
         
         Instance inst = new DenseInstance(1.0, values);
         

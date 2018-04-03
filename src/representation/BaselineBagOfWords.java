@@ -19,20 +19,22 @@ public class BaselineBagOfWords {
     private final HashMap<String, Double> BaselineBowMap;
     private ArrayList<String> possibleSequences;
 
-    public BaselineBagOfWords() {
+    private int length;
+    public BaselineBagOfWords(int length) {
         BowMap = new HashMap<String, Integer>();
+        this.length = length;
         
         String alpha = "ACGT";
         char[] seq = alpha.toCharArray();
 
-        int length = 3;
         possibleSequences = generatePossibleStrings(length, alpha, seq);
         BaselineBowMap = new HashMap<String, Double>();
     }
     
     
-    public BaselineBagOfWords(String sequence) {
-        
+    public BaselineBagOfWords(String sequence, int length) {
+
+        this.length = length;
         double A_count = 14317.0;
         double T_count = 14320.0;
         double C_count = 7436.0;
@@ -45,26 +47,30 @@ public class BaselineBagOfWords {
         String alpha = "ACGT";
         char[] seq = alpha.toCharArray();
 
-        int length = 3;
         possibleSequences = generatePossibleStrings(length, alpha, seq);
-        
-        for(int i = 0; i < sequence.length()-2; i++) {
-            String key = sequence.substring(i, i+3);
+
+        int win = length -1;
+        for(int i = 0; i < sequence.length()-win; i++) {
+            String key = sequence.substring(i, i+length);
             //System.out.println(key);
             if(!BowMap.containsKey(key))
                 BowMap.put(key, 1);
             else
                 BowMap.put(key, BowMap.get(key)+1);
         }
-        
-        
+
+
+        int combos = (int)Math.pow(alpha.length(), length);
         for(String s : possibleSequences) {
             //System.out.println(s);
             //System.out.println(BowMap.toString());
             //System.out.println(BowMap.containsKey(s));
             
             if(BowMap.containsKey(s)) {
-                double freq = (double)(BowMap.get(s) / 64.0);
+                //tri
+                //double freq = (double)(BowMap.get(s) / 64.0);
+                //bi
+                double freq = (double)(BowMap.get(s) / combos);
                 for(int i = 0; i < s.length(); i++) {
                     if(s.charAt(i) == 'A')
                         freq /= A_count / sum_count;
@@ -86,7 +92,13 @@ public class BaselineBagOfWords {
     }
 
     private ArrayList<String> generatePossibleStrings(int length, String alphabet, char[] sequence) {
-        StringBuilder builder = new StringBuilder("   ");
+
+        String e = "";
+        for(int ee=0; ee<this.length;++ee) e = e + " ";
+        //tri
+        //StringBuilder builder = new StringBuilder("   ");
+        //bi
+        StringBuilder builder = new StringBuilder(e);
         
         possibleSequences = new ArrayList<>();
 
