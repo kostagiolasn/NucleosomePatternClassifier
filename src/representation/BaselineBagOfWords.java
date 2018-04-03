@@ -60,7 +60,7 @@ public class BaselineBagOfWords {
         }
 
 
-        int combos = (int)Math.pow(alpha.length(), length);
+        double num_combos = (double)Math.pow(alpha.length(), length);
         for(String s : possibleSequences) {
             //System.out.println(s);
             //System.out.println(BowMap.toString());
@@ -70,7 +70,7 @@ public class BaselineBagOfWords {
                 //tri
                 //double freq = (double)(BowMap.get(s) / 64.0);
                 //bi
-                double freq = (double)(BowMap.get(s) / combos);
+                double freq = (double)(BowMap.get(s) / num_combos);
                 for(int i = 0; i < s.length(); i++) {
                     if(s.charAt(i) == 'A')
                         freq /= A_count / sum_count;
