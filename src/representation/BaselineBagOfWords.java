@@ -35,10 +35,10 @@ public class BaselineBagOfWords {
     public BaselineBagOfWords(String sequence, int length) {
 
         this.length = length;
-        double A_count = 14317.0;
-        double T_count = 14320.0;
-        double C_count = 7436.0;
-        double G_count = 7545.0;
+        double A_count = 0.0;
+        double T_count = 0.0;
+        double C_count = 0.0;
+        double G_count = 0.0;
         double sum_count = A_count + T_count + C_count + G_count;
         
         BowMap = new HashMap<String, Integer>();
@@ -73,14 +73,28 @@ public class BaselineBagOfWords {
                 double freq = (double)(BowMap.get(s) / num_combos);
                 for(int i = 0; i < s.length(); i++) {
                     if(s.charAt(i) == 'A')
-                        freq /= A_count / sum_count;
+                        A_count++;
                     else if(s.charAt(i) == 'T')
-                        freq /= T_count / sum_count;
+                        T_count++;
                     else if(s.charAt(i) == 'C')
-                        freq /= C_count / sum_count;
+                        C_count++;
                     else
-                        freq /= G_count / sum_count;
+                        G_count++;
                 }
+                for(int i = 0; i < s.length(); i++) {
+                    if(s.charAt(i) == 'A')
+                        freq /= A_count / length;
+                    else if(s.charAt(i) == 'T')
+                        freq /= T_count / length;
+                    else if(s.charAt(i) == 'C')
+                        freq /= C_count / length;
+                    else
+                        freq /= G_count / length;
+                }
+                A_count = 0.0;
+                T_count = 0.0;
+                C_count = 0.0;
+                G_count = 0.0;
                 BaselineBowMap.put(s, freq);
             } else BaselineBowMap.put(s, 0.0);
         }
