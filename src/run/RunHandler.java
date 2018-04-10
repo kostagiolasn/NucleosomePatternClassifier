@@ -75,6 +75,7 @@ public class RunHandler {
          List<SequenceInstance> NBS_testingSeqs = null;
         NBS_testingSeqs = new ArrayList();
 
+        double total_score = 0.0d;
         for (int i = 0; i < nfolds; i++) {
             initTrainingSeqs(nfolds, NFRpartitionSize, NFR_trainingSeqs, NFR_Seqs, 
                     NBSpartitionSize, NBS_trainingSeqs, NBS_Seqs);
@@ -491,7 +492,7 @@ public class RunHandler {
                 seconds = (double)elapsedTime / 1000000000.0;
                 System.out.println("time elapsed for BOW classification : " + seconds);
 
-                outputResults(i, ev, ConfMatrix);
+                total_score += outputResults(i, ev, ConfMatrix);
 
 
                 rotate(NFR_Seqs, NFRpartitionSize);
@@ -500,6 +501,7 @@ public class RunHandler {
                 clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
             }
         }
+        System.out.println("Total score:" + total_score / ((double)nfolds));
     }
 
     protected void clearSeqs(List<SequenceInstance> NFR_trainingSeqs, List<SequenceInstance> NBS_trainingSeqs, List<SequenceInstance> NFR_testingSeqs, List<SequenceInstance> NBS_testingSeqs) {
@@ -509,7 +511,7 @@ public class RunHandler {
         NBS_testingSeqs.clear();
     }
 
-    protected void outputResults(int iFoldNo, BinaryStatisticsEvaluator ev, double[][] ConfMatrix) {
+    protected double outputResults(int iFoldNo, BinaryStatisticsEvaluator ev, double[][] ConfMatrix) {
         // Print results
         System.out.println("\n=== Fold:" + iFoldNo + "===");
         System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
@@ -518,6 +520,7 @@ public class RunHandler {
         System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
         System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
         System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+        return ev.getfScore(ConfMatrix);
     }
 
     protected void saveFoldFiles(Instances Training_Instances, int i, Instances Testing_Instances) throws IOException {
