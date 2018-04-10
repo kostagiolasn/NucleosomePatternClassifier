@@ -17,15 +17,17 @@ import java.util.Map;
 public class BaselineBOWHandler implements GenomicSequenceRepresentationHandler<List<BaselineBagOfWords>> {
     
     private final Map<String, BaselineBagOfWords> classModel;
+    int length;
     
-    public BaselineBOWHandler() {
+    public BaselineBOWHandler(int length) {
+        this.length = length;
         this.classModel = new HashMap<>();
     }
 
     @Override
     public void train(List<List<BaselineBagOfWords>> representation, String label) {
         
-        BaselineBagOfWords classBoW = new BaselineBagOfWords();
+        BaselineBagOfWords classBoW = new BaselineBagOfWords(this.length);
             
         for (List<BaselineBagOfWords> representation1 : representation) {
             for (BaselineBagOfWords tempBoW : representation1) {

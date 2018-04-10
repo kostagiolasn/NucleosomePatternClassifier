@@ -49,9 +49,9 @@ implements java.util.Iterator<InstanceList[]>, Serializable {
      * @param nfolds number of folds to split InstanceList into
      * @param r The source of randomness to use in shuffling.
      */
-    public CrossValidationIterator (InstanceList ilist, int nfolds, java.util.Random r) {                       
-        assert (nfolds > 0) : "nfolds: " + this.nfolds;
+    public CrossValidationIterator (InstanceList ilist, int nfolds, java.util.Random r) {
         this.nfolds = nfolds;
+        assert (this.nfolds > 0) : "nfolds: " + this.nfolds;
         this.index = 0;
         double fraction = (double) 1 / nfolds;
         double[] proportions = new double[nfolds];

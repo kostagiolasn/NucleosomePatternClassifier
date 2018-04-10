@@ -45,7 +45,7 @@ import weka.core.converters.ArffSaver;
  * @author nikos
  */
 public class RunHandler {
-    public void run(String NFR_pathfile, String NBS_pathfile, String folds, String representation_type, String classifier_type) throws IOException {
+    public void run(String NFR_pathfile, String NBS_pathfile, String folds, String representation_type, String classifier_type, boolean testAll) throws IOException {
         FAFileReader reader = new FAFileReader();
 //        ManyInstancesPerFileConverter m = new ManyInstancesPerFileConverter();
         ArrayList<SequenceInstance> NFR_instances = reader.getSequencesFromFile(NFR_pathfile);
@@ -64,7 +64,7 @@ public class RunHandler {
         
         List<SequenceInstance> NFR_Seqs = new ArrayList<>(NFR_instances);
         List<SequenceInstance> NBS_Seqs = new ArrayList<>(NBS_instances);
-        
+
         List<SequenceInstance> NFR_trainingSeqs;
         NFR_trainingSeqs = new ArrayList();
          List<SequenceInstance> NBS_trainingSeqs;
@@ -75,6 +75,7 @@ public class RunHandler {
          List<SequenceInstance> NBS_testingSeqs = null;
         NBS_testingSeqs = new ArrayList();
 
+        double total_score = 0.0d;
         for (int i = 0; i < nfolds; i++) {
             initTrainingSeqs(nfolds, NFRpartitionSize, NFR_trainingSeqs, NFR_Seqs, 
                     NBSpartitionSize, NBS_trainingSeqs, NBS_Seqs);
@@ -253,7 +254,8 @@ public class RunHandler {
                 /* The same with the testing sequences */
                 List<List<DocumentNGramGraph>> NFRTestingNGG = ngg_analyst.represent(NFR_testingSeqs);
                 List<List<DocumentNGramGraph>> NBSTestingNGG = ngg_analyst.represent(NBS_testingSeqs);
-                
+
+
                 /* We train the two NGGs only by using the training NGG sequences */
                 long tic = System.nanoTime();
                 
@@ -290,9 +292,24 @@ public class RunHandler {
                 }
                 
                 WekaNGGFeatureVector NGGfv= new WekaNGGFeatureVector();
-                Instances Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors, "train");
-                Instances Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors, "test");
-                
+                Instances Training_Instances = null;
+                Instances Testing_Instances = null;
+                if (!testAll){
+                    Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors, "train");
+                    Testing_Instances = NGGfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors, "test");
+                }
+                else{
+                    ArrayList<NGGFeatureVector> allNBS = new ArrayList<>();
+                    ArrayList<NGGFeatureVector> allNFR = new ArrayList<>();
+                    allNFR.addAll(NFRTrainingVectors);
+                    allNFR.addAll(NFRTestingVectors);
+                    allNBS.addAll( NBSTrainingVectors);
+                    allNBS.addAll( NBSTestingVectors);
+                    System.out.println("Testing on all : " + allNFR.size() + " , " + allNBS.size() + "vectors");
+                    Training_Instances = NGGfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors, "train");
+                    Testing_Instances = NGGfv.fillInstanceSet(allNFR, allNBS, "test");
+                }
+
                 // Store instances to related fold files in ARFF subdir (WARNING: It must exist)
                 try {
                     saveFoldFiles(Training_Instances, i, Testing_Instances);
@@ -304,7 +321,7 @@ public class RunHandler {
                 }
                 
                 tic = System.nanoTime();
-                
+
                 // Perform classification and get Confusion Matrix
                 BinaryStatisticsEvaluator ev = new BinaryStatisticsEvaluator();
                 double[][] ConfMatrix = ev.getConfusionMatrix(Training_Instances, Testing_Instances, classifier_type);
@@ -320,6 +337,11 @@ public class RunHandler {
                 rotate(NBS_Seqs, NBSpartitionSize);
 
                 clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
+
+                if (testAll){
+                    System.out.println("Breaking because testing all.");
+                    break;
+                }
 
             }
             
@@ -400,7 +422,9 @@ public class RunHandler {
                 clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
             }
             
-            if("Baseline_BOW".equals(representation_type)) {
+            if(representation_type.startsWith("Baseline_BOW")) {
+                int length = Integer.parseInt(representation_type.substring("Baseline_BOW".length()));
+                baselinebow_analyst.setLength(length);
                 /* Representing the sequences as BOWs */
                 List<List<BaselineBagOfWords>> NFRTrainingBOW = baselinebow_analyst.represent(NFR_trainingSeqs);
                 List<List<BaselineBagOfWords>> NBSTrainingBOW = baselinebow_analyst.represent(NBS_trainingSeqs);
@@ -413,7 +437,7 @@ public class RunHandler {
                 
                 long tic = System.nanoTime();
                 
-                BaselineBOWHandler handler = new BaselineBOWHandler();
+                BaselineBOWHandler handler = new BaselineBOWHandler(length);
                 handler.train(NFRTrainingBOW, "Nucleosome Free Region");
                 handler.train(NBSTrainingBOW, "Nucleosome Binding Site");
                 
@@ -443,7 +467,7 @@ public class RunHandler {
                     NBSTestingVectors.add((BaselineBOWFeatureVector) handler.getFeatureVector(NBSinstanceRepresentation, "Nucleosome Binding Site"));
                 }
                 
-                WekaBaselineBOWFeatureVector BBOWfv= new WekaBaselineBOWFeatureVector();
+                WekaBaselineBOWFeatureVector BBOWfv= new WekaBaselineBOWFeatureVector(length);
                 Instances Training_Instances = BBOWfv.fillInstanceSet(NFRTrainingVectors, NBSTrainingVectors);
                 Instances Testing_Instances = BBOWfv.fillInstanceSet(NFRTestingVectors, NBSTestingVectors);
                 
@@ -468,7 +492,7 @@ public class RunHandler {
                 seconds = (double)elapsedTime / 1000000000.0;
                 System.out.println("time elapsed for BOW classification : " + seconds);
 
-                outputResults(i, ev, ConfMatrix);
+                total_score += outputResults(i, ev, ConfMatrix);
 
 
                 rotate(NFR_Seqs, NFRpartitionSize);
@@ -477,6 +501,7 @@ public class RunHandler {
                 clearSeqs(NFR_trainingSeqs, NBS_trainingSeqs, NFR_testingSeqs, NBS_testingSeqs);
             }
         }
+        System.out.println("Total score:" + total_score / ((double)nfolds));
     }
 
     protected void clearSeqs(List<SequenceInstance> NFR_trainingSeqs, List<SequenceInstance> NBS_trainingSeqs, List<SequenceInstance> NFR_testingSeqs, List<SequenceInstance> NBS_testingSeqs) {
@@ -486,7 +511,7 @@ public class RunHandler {
         NBS_testingSeqs.clear();
     }
 
-    protected void outputResults(int iFoldNo, BinaryStatisticsEvaluator ev, double[][] ConfMatrix) {
+    protected double outputResults(int iFoldNo, BinaryStatisticsEvaluator ev, double[][] ConfMatrix) {
         // Print results
         System.out.println("\n=== Fold:" + iFoldNo + "===");
         System.out.println("Precision of model :" + ev.getPrecision(ConfMatrix));
@@ -495,6 +520,7 @@ public class RunHandler {
         System.out.println("Recall of model :" + ev.getRecall(ConfMatrix));
         System.out.println("Specificity of model :" + ev.getSpecificity(ConfMatrix));
         System.out.println("F-score of model :" + ev.getfScore(ConfMatrix));
+        return ev.getfScore(ConfMatrix);
     }
 
     protected void saveFoldFiles(Instances Training_Instances, int i, Instances Testing_Instances) throws IOException {

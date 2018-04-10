@@ -13,14 +13,15 @@ import java.util.List;
  *
  * @author nikos
  */
-public class BaselineBOW_SequenceAnalyst implements GenomicSequenceAnalyst<List<BaselineBagOfWords>> {
+public class BaselineBOW_SequenceAnalyst extends NGramModel implements GenomicSequenceAnalyst<List<BaselineBagOfWords>> {
 
+int length;
     @Override
     public List<List<BaselineBagOfWords>> represent(List<SequenceInstance> Seqs) {
         List<List<BaselineBagOfWords>> Res = new ArrayList<>();
         
         for(SequenceInstance instance : Seqs) {
-            BaselineBagOfWords tempBow = new BaselineBagOfWords(instance.getSymbolSequence());
+            BaselineBagOfWords tempBow = new BaselineBagOfWords(instance.getSymbolSequence(), this.getLength());
             
             List<BaselineBagOfWords> bowList = new ArrayList<>();
             
